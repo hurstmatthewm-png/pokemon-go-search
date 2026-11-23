@@ -13,7 +13,8 @@
     :root{--bg:#12151d;--card:#1b1f2a;--ink:#e9ecf3;--muted:#98a0b3;--line:#2c3242;
       --must-bg:#143524;--any-bg:#16244a;--ex-bg:#3d1818;}
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;min-width:0}
+  html,body{overflow-x:hidden;max-width:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
   header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
   h1{font-size:17px;margin:0 0 8px}
@@ -43,9 +44,9 @@
   .hidden{display:none!important}
   .builder{display:grid;grid-template-columns:1fr;gap:8px}
   .brow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .brow label{min-width:110px;font-weight:600;font-size:14px}
-  .brow input,.brow select{width:84px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
-  .brow input.wide{width:160px}
+  .brow label{flex:0 0 100px;font-weight:600;font-size:14px}
+  .brow input,.brow select{width:76px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+  .brow input.wide{width:auto;flex:1 1 120px}
   .addwrap{display:inline-flex;align-items:center;gap:2px}
   .del{padding:4px 8px;border-radius:999px;font-size:12px;color:var(--ex)}
   .legend span{display:inline-block;margin-right:10px}
@@ -267,6 +268,10 @@ document.getElementById("copy").addEventListener("click",function(){
 });
 document.getElementById("clear").onclick=()=>{state.clear();order.length=0;render();};
 
+// after typing, snap the page back to its left edge
+document.addEventListener("focusout",function(){
+  setTimeout(function(){ if(window.scrollX!==0) window.scrollTo(0,window.scrollY); },50);
+});
 render();
 </script>
 </body>
