@@ -51,6 +51,8 @@
   .del{padding:4px 8px;border-radius:999px;font-size:12px;color:var(--ex)}
   .legend span{display:inline-block;margin-right:10px}
   input,textarea,select{font-size:16px!important}
+  .coffee{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px auto 16px;max-width:320px;padding:12px 18px;border-radius:12px;background:#ffdd00;color:#1d1d1d;font-weight:700;text-decoration:none;font-size:16px}
+  .coffee:focus-visible{outline:3px solid var(--any);outline-offset:2px}
   footer{font-size:12px;color:var(--muted);padding:0 4px;line-height:1.5}
 </style>
 </head>
@@ -98,6 +100,7 @@
   <div id="lists"></div>
 
   <footer>
+    <a class="coffee" href="https://buymeacoffee.com/muttchew" target="_blank" rel="noopener">☕ Found this useful? Buy me a coffee</a>
     <p><b>How the string is put together:</b> in Pokémon GO, <code>&amp;</code> means AND, <code>,</code> means OR, and <code>!</code> means NOT. Commas are grouped before ampersands, so <code>a&amp;b,c&amp;!d</code> reads as “a AND (b OR c) AND NOT d”.</p>
     <p>Terms come from Niantic’s help page plus well-known community terms (e.g. raid, gbl, rocket, gender, specialbackground). The game adds and renames terms now and then, so if one returns nothing it may have changed. Search terms are in English; other game languages use translated words.</p>
   </footer>
