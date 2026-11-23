@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokémon GO Search Builder</title>
+<style>
+  :root{
+    --bg:#f4f6fb;--card:#fff;--ink:#1d2333;--muted:#6b7385;--line:#dde2ec;
+    --must:#1f9d55;--must-bg:#e3f6eb;--any:#2563eb;--any-bg:#e4ecfd;--ex:#d63a3a;--ex-bg:#fde6e6;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#12151d;--card:#1b1f2a;--ink:#e9ecf3;--muted:#98a0b3;--line:#2c3242;
+      --must-bg:#143524;--any-bg:#16244a;--ex-bg:#3d1818;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+  header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  h1{font-size:17px;margin:0 0 8px}
+  .out{display:flex;gap:8px}
+  #output{flex:1;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:42px;word-break:break-all;resize:none}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 12px}
+  .primary{background:var(--any);color:#fff;border-color:var(--any);font-weight:600}
+  .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .mode button{flex:1;font-weight:600;padding:8px 6px}
+  .mode button.on[data-m="must"]{background:var(--must);color:#fff;border-color:var(--must)}
+  .mode button.on[data-m="any"]{background:var(--any);color:#fff;border-color:var(--any)}
+  .mode button.on[data-m="ex"]{background:var(--ex);color:#fff;border-color:var(--ex)}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
+  main{padding:12px 14px 60px;max-width:900px;margin:0 auto}
+  #filter{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:10px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+  h2{font-size:14px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{padding:6px 10px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-size:14px;line-height:1.2;text-align:left}
+  .chip small{display:block;font-size:11px;color:var(--muted)}
+  .chip.must{background:var(--must-bg);border-color:var(--must)}
+  .chip.any{background:var(--any-bg);border-color:var(--any)}
+  .chip.ex{background:var(--ex-bg);border-color:var(--ex);text-decoration:line-through}
+  .chip.must::before{content:"✓ ";color:var(--must);font-weight:700}
+  .chip.any::before{content:"∨ ";color:var(--any);font-weight:700}
+  .chip.ex::before{content:"✕ ";color:var(--ex);font-weight:700;display:inline-block;text-decoration:none}
+  .hidden{display:none!important}
+  .builder{display:grid;grid-template-columns:1fr;gap:8px}
+  .brow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .brow label{min-width:110px;font-weight:600;font-size:14px}
+  .brow input,.brow select{width:84px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+  .brow input.wide{width:160px}
+  .addwrap{display:inline-flex;align-items:center;gap:2px}
+  .del{padding:4px 8px;border-radius:999px;font-size:12px;color:var(--ex)}
+  .legend span{display:inline-block;margin-right:10px}
+  footer{font-size:12px;color:var(--muted);padding:0 4px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pokémon GO Search Builder</h1>
+  <div class="out">
+    <textarea id="output" rows="2" readonly placeholder="Tap terms below to build your search…"></textarea>
+    <button class="primary" id="copy">Copy</button>
+  </div>
+  <div class="row mode" id="mode">
+    <button data-m="must" class="on">✓ Must have</button>
+    <button data-m="any">∨ Any of</button>
+    <button data-m="ex">✕ Exclude</button>
+  </div>
+  <div class="row">
+    <button id="clear">Clear all</button>
+    <span class="hint" id="count">0 terms selected</span>
+  </div>
+  <div class="hint">Pick a mode, then tap terms. Tap a selected term again to remove it, or tap it in another mode to switch it. “Must have” terms all apply; “Any of” terms are grouped so one is enough; “Exclude” terms are each removed.</div>
+</header>
+
+<main>
+  <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
+
+  <section id="added-sec" class="hidden">
+    <h2>Your added terms</h2>
+    <div class="chips" id="added"></div>
+  </section>
+
+  <section>
+    <h2>Add a number range or custom term</h2>
+    <div class="builder">
+      <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
+      <div class="brow"><label>HP</label><input id="hp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="hp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="hp">Add</button></div>
+      <div class="brow"><label>Distance (km)</label><input id="distance-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="distance-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="distance">Add</button></div>
+      <div class="brow"><label>Age (days)</label><input id="age-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="age-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="age">Add</button></div>
+      <div class="brow"><label>Pokédex no.</label><input id="dex-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="from"><span>to</span><input id="dex-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="to"><button data-add="dex">Add</button></div>
+      <div class="brow"><label>Tag</label><input id="tag" class="wide" placeholder="e.g. pvp"><button data-add="tag">Add</button></div>
+      <div class="brow"><label>Move name</label><input id="move" class="wide" placeholder="e.g. counter"><button data-add="move">Add</button></div>
+    </div>
+    <div class="hint">Leave “max” empty for “this or higher”, or “min” empty for “this or lower”. Added terms use the current mode. Tap ✕ to delete one.</div>
+  </section>
+
+  <div id="lists"></div>
+
+  <footer>
+    <p><b>How the string is put together:</b> in Pokémon GO, <code>&amp;</code> means AND, <code>,</code> means OR, and <code>!</code> means NOT. Commas are grouped before ampersands, so <code>a&amp;b,c&amp;!d</code> reads as “a AND (b OR c) AND NOT d”.</p>
+    <p>Terms come from Niantic’s help page plus well-known community terms (e.g. raid, gbl, rocket, gender, specialbackground). The game adds and renames terms now and then, so if one returns nothing it may have changed. Search terms are in English; other game languages use translated words.</p>
+  </footer>
+</main>
+
+<script>
+const TYPES=["normal","fire","water","grass","electric","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
+const r=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+
+const GROUPS=[
+ {name:"Pokémon type",terms:TYPES.map(t=>[t])},
+ {name:"Region",terms:["kanto","johto","hoenn","sinnoh","unova","kalos","alola","galar","hisui","paldea"].map(t=>[t])},
+ {name:"Special forms & variants",terms:[
+   ["shiny"],["lucky"],["shadow"],["purified"],["costume","event costumes"],
+   ["dynamax"],["gigantamax"],["fusion","can fuse / fused"],
+   ["background","any special background"],["locationbackground","location background"],["specialbackground","special background"]]},
+ {name:"Rarity",terms:[["legendary"],["mythical"],["ultra beasts"]]},
+ {name:"Evolution",terms:[
+   ["evolve","can evolve now"],["evolvenew","new Pokédex entry"],["evolvequest","needs a task to evolve"],
+   ["item","needs an item"],["tradeevolve","free evolve via trade"],
+   ["megaevolve","can Mega Evolve"],["mega1","Mega level 1"],["mega2","Mega level 2"],["mega3","Mega level 3"]]},
+ {name:"Status",terms:[
+   ["favorite"],["defender","in a gym"],["traded"],["hatched"],["eggsonly","only from eggs"],
+   ["hypertraining","can be hyper trained"],["#","has any tag"],["buddy","any buddy level"]]},
+ {name:"Where caught",terms:[
+   ["raid"],["remoteraid","remote raid"],["exraid","EX raid"],["research","research reward"],
+   ["gbl","GO Battle League"],["rocket","Team GO Rocket"],["snapshot","photobomb"]]},
+ {name:"Gender",terms:[["male"],["female"],["genderunknown","no gender"]]},
+ {name:"Size",terms:[["xxs"],["xs"],["xl"],["xxl"]]},
+ {name:"Appraisal – overall stars",terms:r(0,4).map(n=>[n+"*",n+" star"+(n==1?"":"s")])},
+ {name:"Appraisal – Attack bars",terms:r(0,4).map(n=>[n+"attack"])},
+ {name:"Appraisal – Defense bars",terms:r(0,4).map(n=>[n+"defense"])},
+ {name:"Appraisal – HP bars",terms:r(0,4).map(n=>[n+"hp"])},
+ {name:"Buddy level",terms:r(0,5).map(n=>["buddy"+n,["not a buddy","Good","Great","Ultra","Best","Best (max)"][n]])},
+ {name:"Year caught",terms:r(2016,new Date().getFullYear()).map(y=>["year"+y])},
+ {name:"Moves – special",terms:[["@weather","weather-boosted move"],["@special","legacy / exclusive move"]]},
+ {name:"Moves – any move of type",terms:TYPES.map(t=>["@"+t])},
+ {name:"Moves – fast move type",terms:TYPES.map(t=>["@1"+t])},
+ {name:"Moves – charged move type",terms:TYPES.map(t=>["@2"+t])},
+ {name:"Moves – second charged move type",terms:TYPES.map(t=>["@3"+t])},
+];
+
+let mode="must";
+const state=new Map();   // term -> "must"|"any"|"ex"
+const added=[];          // custom terms, in order
+const order=[];          // selection order
+
+function setTerm(term){
+  const cur=state.get(term);
+  if(cur===mode){state.delete(term);order.splice(order.indexOf(term),1);}
+  else{if(!cur)order.push(term);state.set(term,mode);}
+  render();
+}
+
+function build(){
+  const must=[],any=[],ex=[];
+  for(const t of order){const m=state.get(t);(m==="must"?must:m==="any"?any:ex).push(t);}
+  const parts=[...must];
+  if(any.length)parts.push(any.join(","));
+  ex.forEach(t=>parts.push("!"+t));
+  return {str:parts.join("&"),n:must.length+any.length+ex.length};
+}
+
+function chip(term,label){
+  const b=document.createElement("button");
+  b.className="chip";b.dataset.term=term;
+  b.innerHTML=esc(term)+(label?`<small>${esc(label)}</small>`:"");
+  b.dataset.search=(term+" "+(label||"")).toLowerCase();
+  b.onclick=()=>setTerm(term);
+  return b;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+const lists=document.getElementById("lists");
+GROUPS.forEach(g=>{
+  const s=document.createElement("section");
+  s.innerHTML=`<h2>${esc(g.name)}</h2>`;
+  const c=document.createElement("div");c.className="chips";
+  g.terms.forEach(([t,l])=>c.appendChild(chip(t,l)));
+  s.appendChild(c);lists.appendChild(s);
+});
+
+function render(){
+  document.querySelectorAll(".chip").forEach(b=>{
+    b.classList.remove("must","any","ex");
+    const m=state.get(b.dataset.term);if(m)b.classList.add(m);
+  });
+  const {str,n}=build();
+  document.getElementById("output").value=str;
+  document.getElementById("count").textContent=n+" term"+(n==1?"":"s")+" selected";
+}
+
+// mode buttons
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{
+  mode=b.dataset.m;
+  document.querySelectorAll("#mode button").forEach(x=>x.classList.toggle("on",x===b));
+});
+
+// range / custom builders
+function digits(id){return (document.getElementById(id).value||"").replace(/[^0-9]/g,"");}
+function text(id){return (document.getElementById(id).value||"").trim();}
+function rangeTerm(prefix,min,max){
+  if(min===""&&max==="")return null;
+  if(min!==""&&max!=="")return min===max?prefix+min:prefix+min+"-"+max;
+  return min!==""?prefix+min+"-":prefix+"-"+max;
+}
+function chipExists(term){
+  var all=document.querySelectorAll(".chip");
+  for(var i=0;i<all.length;i++){if(all[i].getAttribute("data-term")===term)return true;}
+  return false;
+}
+var addBtns=document.querySelectorAll("[data-add]");
+for(var i=0;i<addBtns.length;i++){(function(b){
+  b.addEventListener("click",function(){
+    try{
+      var k=b.getAttribute("data-add"),term=null;
+      if(k==="cp"||k==="hp"||k==="distance"||k==="age")term=rangeTerm(k,digits(k+"-min"),digits(k+"-max"));
+      else if(k==="dex")term=rangeTerm("",digits("dex-min"),digits("dex-max"));
+      else if(k==="tag"){var t=text("tag").replace(/^#/,"");if(t)term="#"+t.toLowerCase();}
+      else if(k==="move"){var m=text("move").replace(/^@/,"");if(m)term="@"+m.toLowerCase();}
+      if(!term){flash(b,"Enter a value");return;}
+      if(!chipExists(term)){
+        added.push(term);
+        var wrap=document.createElement("span");wrap.className="addwrap";
+        var c=chip(term,"");
+        var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
+        del.setAttribute("aria-label","Delete "+term);
+        del.addEventListener("click",function(){removeAdded(term,wrap);});
+        wrap.appendChild(c);wrap.appendChild(del);
+        document.getElementById("added").appendChild(wrap);
+        document.getElementById("added-sec").classList.remove("hidden");
+      }
+      if(state.get(term)!==mode)setTerm(term);
+      var ins=b.parentNode.querySelectorAll("input");
+      for(var j=0;j<ins.length;j++)ins[j].value="";
+    }catch(err){flash(b,"Error");console.error(err);}
+  });
+})(addBtns[i]);}
+function removeAdded(term,el){
+  var i=added.indexOf(term);if(i>-1)added.splice(i,1);
+  el.parentNode.removeChild(el);
+  if(state.has(term)){state.delete(term);order.splice(order.indexOf(term),1);}
+  if(!added.length)document.getElementById("added-sec").classList.add("hidden");
+  render();
+}
+function flash(b,msg){var o=b.textContent;b.textContent=msg;setTimeout(function(){b.textContent=o;},1200);}
+
+// filter
+document.getElementById("filter").oninput=e=>{
+  const q=e.target.value.toLowerCase().trim();
+  document.querySelectorAll("#lists section").forEach(s=>{
+    let any=false;
+    s.querySelectorAll(".chip").forEach(c=>{const hit=!q||c.dataset.search.includes(q);c.classList.toggle("hidden",!hit);any=any||hit;});
+    s.classList.toggle("hidden",!any);
+  });
+};
+
+// copy & clear
+document.getElementById("copy").addEventListener("click",function(){
+  var out=document.getElementById("output"),b=this;
+  if(!out.value)return;
+  function fallback(){out.removeAttribute("readonly");out.focus();out.select();out.setSelectionRange(0,99999);
+    var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+    out.setAttribute("readonly","");flash(b,ok?"Copied!":"Select & copy");}
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(out.value).then(function(){flash(b,"Copied!");},fallback);
+  }else fallback();
+});
+document.getElementById("clear").onclick=()=>{state.clear();order.length=0;render();};
+
+render();
+</script>
+</body>
+</html>
