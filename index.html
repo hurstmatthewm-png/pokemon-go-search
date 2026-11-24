@@ -2,8 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Pokémon GO Search Builder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokémon GO Search Builder – Free Search String Maker</title>
+<meta name="description" content="Build Pokémon GO search strings by tapping. Combine IVs, types, shiny, legendary, CP ranges, tags and more, then copy and paste straight into the game. Free, no sign-up.">
+<meta name="keywords" content="Pokémon GO search strings, Pokémon GO search filter, Pokémon GO search builder, Pokémon GO storage search, IV search, PvP search string">
+<link rel="canonical" href="https://hurstmatthewm-png.github.io/pokemon-go-search/">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pokémon GO Search Builder">
+<meta property="og:title" content="Pokémon GO Search Builder">
+<meta property="og:description" content="Tap to build search strings for your Pokémon storage. Free, no sign-up. Copy and paste into the game.">
+<meta property="og:url" content="https://hurstmatthewm-png.github.io/pokemon-go-search/">
+<meta property="og:image" content="https://hurstmatthewm-png.github.io/pokemon-go-search/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pokémon GO Search Builder">
+<meta name="twitter:description" content="Tap to build search strings for your Pokémon storage. Free, no sign-up.">
+<meta name="twitter:image" content="https://hurstmatthewm-png.github.io/pokemon-go-search/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Pokémon GO Search Builder","url":"https://hurstmatthewm-png.github.io/pokemon-go-search/","applicationCategory":"GameApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"AUD"},"description":"Build Pokémon GO search strings by tapping, then copy and paste into the game."}
+</script>
+<script data-goatcounter="https://muttchew.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <style>
   :root{
     --bg:#f4f6fb;--card:#fff;--ink:#1d2333;--muted:#6b7385;--line:#dde2ec;
@@ -103,6 +126,7 @@
     <a class="coffee" href="https://buymeacoffee.com/muttchew" target="_blank" rel="noopener">☕ Found this useful? Buy me a coffee</a>
     <p><b>How the string is put together:</b> in Pokémon GO, <code>&amp;</code> means AND, <code>,</code> means OR, and <code>!</code> means NOT. Commas are grouped before ampersands, so <code>a&amp;b,c&amp;!d</code> reads as “a AND (b OR c) AND NOT d”.</p>
     <p>Terms come from Niantic’s help page plus well-known community terms (e.g. raid, gbl, rocket, gender, specialbackground). The game adds and renames terms now and then, so if one returns nothing it may have changed. Search terms are in English; other game languages use translated words.</p>
+    <p class="hint">Fan-made tool. Not affiliated with or endorsed by Niantic, Nintendo or The Pokémon Company. Pokémon and Pokémon GO are trademarks of their respective owners.</p>
   </footer>
 </main>
 
@@ -262,6 +286,7 @@ document.getElementById("filter").oninput=e=>{
 document.getElementById("copy").addEventListener("click",function(){
   var out=document.getElementById("output"),b=this;
   if(!out.value)return;
+  try{window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:"copy-string",title:"Copied a search string",event:true});}catch(e){}
   function fallback(){out.removeAttribute("readonly");out.focus();out.select();out.setSelectionRange(0,99999);
     var ok=false;try{ok=document.execCommand("copy");}catch(e){}
     out.setAttribute("readonly","");flash(b,ok?"Copied!":"Select & copy");}
