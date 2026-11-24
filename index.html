@@ -136,6 +136,7 @@
       <button class="preset" data-str="age0-7" data-name="Caught this week"><b>Caught this week</b><small>Caught in the last 7 days</small><code>age0-7</code></button>
       <button class="preset" data-str="shadow&amp;@frustration" data-name="Shadows with Frustration"><b>Shadows with Frustration</b><small>Shadows still stuck with Frustration</small><code>shadow&amp;@frustration</code></button>
       <button class="preset" data-str="@special" data-name="Legacy moves"><b>Legacy moves</b><small>Pokémon with event or retired moves</small><code>@special</code></button>
+      <button class="preset" data-str="countcandyxl296-" data-name="Enough XL candy for level 50"><b>Enough XL candy for level 50</b><small>296+ XL candy: enough to take a Pokémon from level 40 to 50</small><code>countcandyxl296-</code></button>
     </div>
     <button id="more-presets" type="button">Show all 12</button>
     <div class="hint">Tap one to load it, then add or remove terms below to make it your own.</div>
@@ -167,6 +168,8 @@
       <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
       <div class="brow"><label>HP</label><input id="hp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="hp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="hp">Add</button></div>
       <div class="brow"><label>Distance (km)</label><input id="distance-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="distance-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="distance">Add</button></div>
+      <div class="brow"><label>Candy</label><input id="candy-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candy-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candy">Add</button></div>
+      <div class="brow"><label>XL candy</label><input id="candyxl-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candyxl-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candyxl">Add</button></div>
       <div class="brow"><label>Age (days)</label><input id="age-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="age-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="age">Add</button></div>
       <div class="brow"><label>Pokédex no.</label><input id="dex-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="from"><span>to</span><input id="dex-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="to"><button data-add="dex">Add</button></div>
       <div class="brow"><label>Tag</label><input id="tag" class="wide" placeholder="e.g. pvp"><button data-add="tag">Add</button></div>
@@ -299,6 +302,7 @@ for(var i=0;i<addBtns.length;i++){(function(b){
     try{
       var k=b.getAttribute("data-add"),term=null;
       if(k==="cp"||k==="hp"||k==="distance"||k==="age")term=rangeTerm(k,digits(k+"-min"),digits(k+"-max"));
+      else if(k==="candy"||k==="candyxl")term=rangeTerm("count"+k,digits(k+"-min"),digits(k+"-max"));
       else if(k==="dex")term=rangeTerm("",digits("dex-min"),digits("dex-max"));
       else if(k==="tag"){var t=text("tag").replace(/^#/,"");if(t)term="#"+t.toLowerCase();}
       else if(k==="move"){var m=text("move").replace(/^@/,"");if(m)term="@"+m.toLowerCase();}
