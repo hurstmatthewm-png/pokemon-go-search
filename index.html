@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pokémon GO Search Builder – Free Search String Maker</title>
-<meta name="description" content="Build Pokémon GO search strings by tapping. Combine IVs, types, shiny, legendary, CP ranges, tags and more, then copy and paste straight into the game. Free, no sign-up.">
+<meta name="description" content="Build Pokémon GO search strings by tapping, or start from ready-made ones: transfer junk, hundos, Great League candidates, lucky trade fodder and more. Save, share and copy straight into the game. Free, no sign-up.">
 <meta name="keywords" content="Pokémon GO search strings, Pokémon GO search filter, Pokémon GO search builder, Pokémon GO storage search, IV search, PvP search string">
 <link rel="canonical" href="https://hurstmatthewm-png.github.io/pokemon-go-search/">
 <meta name="theme-color" content="#2563eb">
@@ -77,6 +77,26 @@
   .coffee{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px auto 16px;max-width:320px;padding:12px 18px;border-radius:12px;background:#ffdd00;color:#1d1d1d;font-weight:700;text-decoration:none;font-size:16px}
   .coffee:focus-visible{outline:3px solid var(--any);outline-offset:2px}
   footer{font-size:12px;color:var(--muted);padding:0 4px;line-height:1.5}
+  details.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+  details.sec summary{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;list-style:none}
+  details.sec summary::-webkit-details-marker{display:none}
+  details.sec summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+  details.sec[open] summary::before{transform:rotate(90deg)}
+  details.sec[open] summary{margin-bottom:10px}
+  .presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .preset{text-align:left;padding:10px 12px;line-height:1.3}
+  .preset b{display:block;font-size:15px}
+  .preset small{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px}
+  .preset code{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;color:var(--any);word-break:break-all}
+  .presets:not(.all) .preset:nth-child(n+5){display:none}
+  #more-presets{margin-top:8px;width:100%}
+  .preset:active,.saved-item button:active{transform:scale(.98)}
+  .saved-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+  .saved-item{display:flex;gap:6px;align-items:stretch}
+  .saved-item .load{flex:1;text-align:left;line-height:1.3}
+  .saved-item .load small{display:block;font-size:12px;color:var(--any);font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+  .saved-item .del{align-self:center}
+  .empty{font-size:13px;color:var(--muted);margin:0 0 8px}
 </style>
 </head>
 <body>
@@ -93,12 +113,46 @@
   </div>
   <div class="row">
     <button id="clear">Clear all</button>
+    <button id="share">Share link</button>
     <span class="hint" id="count">0 terms selected</span>
   </div>
   <div class="hint">Pick a mode, then tap terms. Tap a selected term again to remove it, or tap it in another mode to switch it. “Must have” terms all apply; “Any of” terms are grouped so one is enough; “Exclude” terms are each removed.</div>
 </header>
 
 <main>
+  <details class="sec" id="presets-sec" open>
+    <summary>Ready-made searches</summary>
+    <div class="presets">
+      <button class="preset" data-str="0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs" data-name="Transfer junk"><b>Transfer junk</b><small>Low-star Pokémon with nothing special about them</small><code>0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs</code></button>
+      <button class="preset" data-str="4*" data-name="Perfect IVs (hundos)"><b>Perfect IVs (hundos)</b><small>Every 4-star Pokémon</small><code>4*</code></button>
+      <button class="preset" data-str="0attack&amp;0defense&amp;0hp" data-name="Zero IVs (nundos)"><b>Zero IVs (nundos)</b><small>0 Attack, 0 Defense, 0 HP</small><code>0attack&amp;0defense&amp;0hp</code></button>
+      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500" data-name="Great League candidates"><b>Great League candidates</b><small>Low Attack, high Defense and HP, 1500 CP or less</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500</code></button>
+      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500" data-name="Ultra League candidates"><b>Ultra League candidates</b><small>Low Attack, high Defense and HP, 2500 CP or less</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500</code></button>
+      <button class="preset" data-str="year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite" data-name="Lucky trade fodder"><b>Lucky trade fodder</b><small>Older Pokémon that haven&#x27;t been traded yet</small><code>year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite</code></button>
+      <button class="preset" data-str="shiny&amp;!traded&amp;!favorite&amp;!legendary&amp;!mythical" data-name="Shinies to trade"><b>Shinies to trade</b><small>Untraded shinies that aren&#x27;t favourites</small><code>shiny&amp;!traded&amp;!favorite&amp;!legendary&amp;!mythical</code></button>
+      <button class="preset" data-str="tradeevolve&amp;!traded" data-name="Free trade evolutions"><b>Free trade evolutions</b><small>Evolve for free after trading</small><code>tradeevolve&amp;!traded</code></button>
+      <button class="preset" data-str="evolvenew" data-name="New Pokédex entries"><b>New Pokédex entries</b><small>Evolve these to fill your Pokédex</small><code>evolvenew</code></button>
+      <button class="preset" data-str="age0-7" data-name="Caught this week"><b>Caught this week</b><small>Caught in the last 7 days</small><code>age0-7</code></button>
+      <button class="preset" data-str="shadow&amp;@frustration" data-name="Shadows with Frustration"><b>Shadows with Frustration</b><small>Shadows still stuck with Frustration</small><code>shadow&amp;@frustration</code></button>
+      <button class="preset" data-str="@special" data-name="Legacy moves"><b>Legacy moves</b><small>Pokémon with event or retired moves</small><code>@special</code></button>
+    </div>
+    <button id="more-presets" type="button">Show all 12</button>
+    <div class="hint">Tap one to load it, then add or remove terms below to make it your own.</div>
+  </details>
+
+  <section id="saved-sec">
+    <h2>Your saved searches</h2>
+    <div class="saved-list" id="saved"></div>
+    <div class="brow"><input id="save-name" class="wide" maxlength="40" placeholder="Name it, e.g. PvP keepers"><button id="save-btn">Save current</button></div>
+    <div class="hint">Saved on this phone or computer only. No account needed.</div>
+  </section>
+
+  <details class="sec" id="paste-sec">
+    <summary>Paste a search string to edit it</summary>
+    <div class="brow"><input id="paste-in" class="wide" placeholder="e.g. 4*&amp;shiny,lucky&amp;!traded" autocapitalize="off" autocorrect="off" spellcheck="false"><button id="paste-btn">Load</button></div>
+    <div class="hint">Terms the builder knows light up below. Anything else (Pokémon names, ranges, tags) goes under “Your added terms”.</div>
+  </details>
+
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
 
   <section id="added-sec" class="hidden">
@@ -182,8 +236,10 @@ function setTerm(term){
 function build(){
   const must=[],any=[],ex=[];
   for(const t of order){const m=state.get(t);(m==="must"?must:m==="any"?any:ex).push(t);}
-  const parts=[...must];
+  // plain "must" terms first, then the "any of" group, then any pasted extra OR-groups (kept in order)
+  const parts=must.filter(t=>!t.includes(","));
   if(any.length)parts.push(any.join(","));
+  parts.push(...must.filter(t=>t.includes(",")));
   ex.forEach(t=>parts.push("!"+t));
   return {str:parts.join("&"),n:must.length+any.length+ex.length};
 }
@@ -246,23 +302,25 @@ for(var i=0;i<addBtns.length;i++){(function(b){
       else if(k==="tag"){var t=text("tag").replace(/^#/,"");if(t)term="#"+t.toLowerCase();}
       else if(k==="move"){var m=text("move").replace(/^@/,"");if(m)term="@"+m.toLowerCase();}
       if(!term){flash(b,"Enter a value");return;}
-      if(!chipExists(term)){
-        added.push(term);
-        var wrap=document.createElement("span");wrap.className="addwrap";
-        var c=chip(term,"");
-        var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
-        del.setAttribute("aria-label","Delete "+term);
-        del.addEventListener("click",function(){removeAdded(term,wrap);});
-        wrap.appendChild(c);wrap.appendChild(del);
-        document.getElementById("added").appendChild(wrap);
-        document.getElementById("added-sec").classList.remove("hidden");
-      }
+      addCustom(term);
       if(state.get(term)!==mode)setTerm(term);
       var ins=b.parentNode.querySelectorAll("input");
       for(var j=0;j<ins.length;j++)ins[j].value="";
     }catch(err){flash(b,"Error");console.error(err);}
   });
 })(addBtns[i]);}
+function addCustom(term){
+  if(chipExists(term))return;
+  added.push(term);
+  var wrap=document.createElement("span");wrap.className="addwrap";
+  var c=chip(term,"");
+  var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
+  del.setAttribute("aria-label","Delete "+term);
+  del.addEventListener("click",function(){removeAdded(term,wrap);});
+  wrap.appendChild(c);wrap.appendChild(del);
+  document.getElementById("added").appendChild(wrap);
+  document.getElementById("added-sec").classList.remove("hidden");
+}
 function removeAdded(term,el){
   var i=added.indexOf(term);if(i>-1)added.splice(i,1);
   el.parentNode.removeChild(el);
@@ -300,7 +358,140 @@ document.getElementById("clear").onclick=()=>{state.clear();order.length=0;rende
 document.addEventListener("focusout",function(){
   setTimeout(function(){ if(window.scrollX!==0) window.scrollTo(0,window.scrollY); },50);
 });
-render();
+
+// ---------- helpers shared by the features below ----------
+function track(path,title){try{window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:path,title:title,event:true});}catch(e){}}
+function store(k,v){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function recall(k,def){try{var v=localStorage.getItem(k);return v===null?def:JSON.parse(v);}catch(e){return def;}}
+
+// Turn a search string back into selected terms.
+// "a&b,c&!d" -> a = must have, b and c = any of, d = exclude.
+// Only one "any of" group fits the builder, so any further comma groups
+// (or negated comma groups) are kept as-is as custom terms, which keeps the meaning.
+function loadString(str){
+  str=String(str||"").slice(0,1000).toLowerCase().replace(/\s*([&,!])\s*/g,"$1").trim();
+  state.clear();order.length=0;
+  var anyUsed=false;
+  str.split("&").forEach(function(part){
+    part=part.trim();if(!part)return;
+    if(part.indexOf(",")>-1){
+      if(!anyUsed&&part.indexOf("!")===-1){
+        anyUsed=true;
+        part.split(",").forEach(function(t){t=t.trim();if(t)put(t,"any");});
+      }else put(part,"must");
+    }else if(part.charAt(0)==="!"&&part.length>1)put(part.slice(1),"ex");
+    else put(part,"must");
+  });
+  // tidy away custom terms left over from an earlier search that this one doesn't use
+  added.slice().forEach(function(t){
+    if(state.has(t))return;
+    var c=document.querySelector('#added .chip[data-term="'+(window.CSS&&CSS.escape?CSS.escape(t):t)+'"]');
+    if(c)removeAdded(t,c.parentNode);
+  });
+  render();
+}
+function put(term,m){
+  addCustom(term);
+  if(!state.has(term))order.push(term);
+  state.set(term,m);
+}
+
+// ---------- 1. ready-made searches ----------
+document.querySelectorAll(".preset").forEach(function(b){
+  b.addEventListener("click",function(){
+    loadString(b.getAttribute("data-str"));
+    track("preset-"+b.getAttribute("data-name").toLowerCase().replace(/[^a-z0-9]+/g,"-"),"Used preset: "+b.getAttribute("data-name"));
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+(function(){
+  var box=document.querySelector(".presets"),btn=document.getElementById("more-presets"),n=box.children.length;
+  btn.textContent="Show all "+n;
+  btn.addEventListener("click",function(){var all=box.classList.toggle("all");btn.textContent=all?"Show fewer":"Show all "+n;});
+})();
+
+// ---------- 2. saved searches ----------
+var FAV_KEY="pgs-saved";
+function getFavs(){var f=recall(FAV_KEY,[]);return Array.isArray(f)?f:[];}
+function renderFavs(){
+  var list=document.getElementById("saved"),favs=getFavs();
+  list.innerHTML="";
+  if(!favs.length){var p=document.createElement("p");p.className="empty";p.textContent="Nothing saved yet. Build a search, give it a name and tap Save current.";list.appendChild(p);return;}
+  favs.forEach(function(f,i){
+    var row=document.createElement("div");row.className="saved-item";
+    var load=document.createElement("button");load.className="load";
+    var nm=document.createElement("b");nm.textContent=f.name;
+    var st=document.createElement("small");st.textContent=f.str;
+    load.appendChild(nm);load.appendChild(st);
+    load.addEventListener("click",function(){loadString(f.str);window.scrollTo({top:0,behavior:"smooth"});});
+    var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
+    del.setAttribute("aria-label","Delete saved search "+f.name);
+    del.addEventListener("click",function(){
+      if(del.textContent!=="Delete?"){del.textContent="Delete?";setTimeout(function(){del.textContent="✕";},2500);return;}
+      var all=getFavs();all.splice(i,1);store(FAV_KEY,all);renderFavs();
+    });
+    row.appendChild(load);row.appendChild(del);list.appendChild(row);
+  });
+}
+document.getElementById("save-btn").addEventListener("click",function(){
+  var b=this,str=build().str,inp=document.getElementById("save-name"),name=inp.value.trim();
+  if(!str){flash(b,"Pick some terms first");return;}
+  if(!name){inp.focus();flash(b,"Add a name");return;}
+  var favs=getFavs().filter(function(f){return f.name.toLowerCase()!==name.toLowerCase();});
+  favs.unshift({name:name,str:str});
+  store(FAV_KEY,favs.slice(0,50));
+  inp.value="";renderFavs();flash(b,"Saved!");track("save-search","Saved a search");
+});
+
+// ---------- 3 & 4. remember the last search + keep it in the web address ----------
+var LAST_KEY="pgs-last";
+var baseRender=render;
+render=function(){
+  baseRender();
+  var str=build().str;
+  store(LAST_KEY,str||null);
+  try{history.replaceState(null,"",str?"#s="+encodeURIComponent(str):location.pathname+location.search);}catch(e){}
+};
+document.getElementById("share").addEventListener("click",function(){
+  var b=this,str=build().str;
+  if(!str){flash(b,"Pick some terms first");return;}
+  var url=location.origin+location.pathname+"#s="+encodeURIComponent(str);
+  track("share-link","Shared a link");
+  if(navigator.share){
+    navigator.share({title:"Pokémon GO search",text:"Pokémon GO search string: "+str,url:url}).catch(function(){});
+  }else if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(url).then(function(){flash(b,"Link copied!");},function(){prompt("Copy this link:",url);});
+  }else prompt("Copy this link:",url);
+});
+
+// ---------- 6. paste to edit ----------
+function pasteLoad(){
+  var inp=document.getElementById("paste-in"),b=document.getElementById("paste-btn"),v=inp.value.trim();
+  if(!v){inp.focus();flash(b,"Paste first");return;}
+  loadString(v);inp.value="";flash(b,"Loaded!");track("paste-load","Loaded a pasted string");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("paste-btn").addEventListener("click",pasteLoad);
+document.getElementById("paste-in").addEventListener("keydown",function(e){if(e.key==="Enter")pasteLoad();});
+
+// ---------- start-up: a shared link wins, otherwise pick up where you left off ----------
+(function(){
+  var m=location.hash.match(/^#s=(.*)$/),start="";
+  if(m){try{start=decodeURIComponent(m[1]);}catch(e){}}
+  if(!start)start=recall(LAST_KEY,"")||"";
+  renderFavs();
+  if(start)loadString(start);else render();
+})();
+window.addEventListener("hashchange",function(){
+  var m=location.hash.match(/^#s=(.*)$/);
+  if(m){try{var s=decodeURIComponent(m[1]);if(s!==build().str)loadString(s);}catch(e){}}
+});
+
+// ---------- 5. works offline ----------
+if("serviceWorker" in navigator&&location.protocol==="https:"){
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+}
 </script>
 </body>
 </html>

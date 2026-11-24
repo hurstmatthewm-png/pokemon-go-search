@@ -12,6 +12,12 @@ Build Pokémon GO search strings by tapping instead of typing. Pick what you wan
 - Number ranges for CP, HP, distance, age and Pokédex number
 - Custom tags and move names
 - One-tap copy
+- Ready-made searches: transfer junk, hundos, nundos, Great/Ultra League candidates, lucky trade fodder and more
+- Save your own searches with a name (stored on your device, no account)
+- Picks up where you left off
+- Share a search as a link
+- Paste in any search string to edit it
+- Works offline once you've opened it
 - Works on any phone; add it to your home screen to use it like an app
 - Free, no sign-up, no cookies
 
