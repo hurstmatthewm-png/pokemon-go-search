@@ -52,6 +52,14 @@
   .mode button.on[data-m="ex"]{background:var(--ex);color:#fff;border-color:var(--ex)}
   .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
   .how{margin:0 2px 12px}
+  .tl-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  .tl-row input{flex:1 1 140px;min-width:0}
+  .tl-row select{flex:0 1 auto;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:16px}
+  .tl-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+  .tl-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px}
+  .tl-item span{flex:1}
+  .tl-item small{color:var(--muted)}
+  .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
   main{padding:12px 14px 60px;max-width:900px;margin:0 auto}
   #filter{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:10px}
   section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
@@ -153,6 +161,26 @@
     <summary>Paste a search string to edit it</summary>
     <div class="brow"><input id="paste-in" class="wide" placeholder="e.g. 4*&amp;shiny,lucky&amp;!traded" autocapitalize="off" autocorrect="off" spellcheck="false"><button id="paste-btn">Load</button></div>
     <div class="hint">Terms the builder knows light up below. Anything else (Pokémon names, ranges, tags) goes under “Your added terms”.</div>
+  </details>
+
+  <details class="sec" id="trade-sec">
+    <summary>Trade list builder (pick regional forms)</summary>
+    <p class="hint" style="margin-top:0">Add the Pokémon you want and choose a form for each. It builds a string that keeps only the forms you picked, e.g. Hisuian Voltorb but not Kanto Voltorb.</p>
+    <div class="tl-row">
+      <input id="tl-name" placeholder="Pokémon name, e.g. voltorb" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="30">
+      <select id="tl-form" aria-label="Form">
+        <option value="">Any form</option>
+        <option value="alola">Alolan</option>
+        <option value="galar">Galarian</option>
+        <option value="hisui">Hisuian</option>
+        <option value="paldea">Paldean</option>
+      </select>
+      <button id="tl-add" type="button">Add</button>
+    </div>
+    <div class="tl-list" id="tl-list"></div>
+    <div class="tl-out" id="tl-out"></div>
+    <div class="brow"><button id="tl-copy" type="button">Copy</button><button id="tl-use" type="button">Open in builder</button><button id="tl-clear" type="button">Clear list</button></div>
+    <div class="hint">How it works: every Pokémon goes in the first group; the second group holds the regions you picked plus any “any form” names, so each Pokémon has to pass both. One catch: regions apply to the whole list, so if you pick Galarian Meowth and Alolan Vulpix, Alolan Meowth will show up too. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
@@ -469,6 +497,68 @@ document.getElementById("share").addEventListener("click",function(){
     navigator.clipboard.writeText(url).then(function(){flash(b,"Link copied!");},function(){prompt("Copy this link:",url);});
   }else prompt("Copy this link:",url);
 });
+
+// ---------- trade list builder ----------
+(function(){
+  var KEY="pgs-tradelist",FORMS={"":"Any form",alola:"Alolan",galar:"Galarian",hisui:"Hisuian",paldea:"Paldean"};
+  var list=recall(KEY,[]);if(!Array.isArray(list))list=[];
+  var nameIn=document.getElementById("tl-name"),formIn=document.getElementById("tl-form"),box=document.getElementById("tl-list"),out=document.getElementById("tl-out");
+  function clean(n){return String(n||"").toLowerCase().replace(/[&,!]/g,"").trim().slice(0,30);}
+  function tradeString(){
+    var names=[],regions=[],anyNames=[];
+    list.forEach(function(e){
+      if(names.indexOf(e.name)<0)names.push(e.name);
+      if(e.form){if(regions.indexOf(e.form)<0)regions.push(e.form);}
+      else if(anyNames.indexOf(e.name)<0)anyNames.push(e.name);
+    });
+    if(!names.length)return "";
+    if(!regions.length)return names.join(",");
+    return names.join(",")+"&"+regions.concat(anyNames).join(",");
+  }
+  function draw(){
+    box.innerHTML="";
+    list.forEach(function(e,i){
+      var row=document.createElement("div");row.className="tl-item";
+      var t=document.createElement("span");t.textContent=e.name+" ";
+      var f=document.createElement("small");f.textContent=FORMS[e.form]||"Any form";t.appendChild(f);
+      var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
+      del.setAttribute("aria-label","Remove "+e.name);
+      del.addEventListener("click",function(){list.splice(i,1);save();});
+      row.appendChild(t);row.appendChild(del);box.appendChild(row);
+    });
+    var str=tradeString();
+    out.textContent=str||"Add a Pokémon to start.";
+  }
+  function save(){store(KEY,list.length?list:null);draw();}
+  function add(){
+    var n=clean(nameIn.value),f=formIn.value,b=document.getElementById("tl-add");
+    if(!n){nameIn.focus();flash(b,"Enter a name");return;}
+    if(!(f in FORMS))f="";
+    var dup=list.some(function(e){return e.name===n&&e.form===f;});
+    if(!dup)list.push({name:n,form:f});
+    nameIn.value="";formIn.value="";nameIn.focus();save();
+  }
+  document.getElementById("tl-add").addEventListener("click",add);
+  nameIn.addEventListener("keydown",function(e){if(e.key==="Enter")add();});
+  document.getElementById("tl-clear").addEventListener("click",function(){
+    var b=this;if(!list.length)return;
+    if(b.textContent!=="Sure?"){b.textContent="Sure?";setTimeout(function(){b.textContent="Clear list";},2500);return;}
+    list=[];b.textContent="Clear list";save();
+  });
+  document.getElementById("tl-copy").addEventListener("click",function(){
+    var b=this,str=tradeString();if(!str){flash(b,"Add a Pokémon first");return;}
+    track("trade-list-copy","Copied a trade list");
+    var done=function(){flash(b,"Copied!");};
+    if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(done,function(){prompt("Copy this:",str);});
+    else prompt("Copy this:",str);
+  });
+  document.getElementById("tl-use").addEventListener("click",function(){
+    var str=tradeString();if(!str){flash(this,"Add a Pokémon first");return;}
+    loadString(str);track("trade-list-open","Opened a trade list in the builder");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+  draw();
+})();
 
 // ---------- 6. paste to edit ----------
 function pasteLoad(){
