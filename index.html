@@ -71,8 +71,6 @@
   .tl-forms{display:flex;gap:4px;flex-wrap:wrap}
   .fchip{padding:5px 10px;font-size:13px;border-radius:999px}
   .fchip.on{background:var(--any);border-color:var(--any);color:#fff}
-  .fchip.evo.on{background:var(--must);border-color:var(--must)}
-  .tl-item .fam{display:block;font-weight:400;font-size:12px;color:var(--muted)}
   .tl-warn{font-size:13px;color:var(--ex);margin:0 2px 8px}
   .tl-warn:empty{display:none}
   .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
@@ -192,7 +190,7 @@
     <div class="tl-warn" id="tl-warn"></div>
     <div class="tl-out" id="tl-out"></div>
     <div class="brow"><button id="tl-copy" type="button">Copy</button><button id="tl-share" type="button">Share list</button><button id="tl-use" type="button">Open in builder</button><button id="tl-clear" type="button">Clear list</button></div>
-    <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Tap “+ evolutions” to include the whole family. Names are used where they're exact; a few (like Mew, which would also find Mewtwo) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
+    <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Pokémon names are used so the game's “show evolutions” option still works; a few (like Mew, which would also find Mewtwo, or names with spaces such as Mr. Mime) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
@@ -531,22 +529,14 @@ document.getElementById("share").addEventListener("click",function(){
     e.clashAny=false;e.clashOther=false;
     ALL.forEach(function(o){if(o!==e&&o.key.indexOf(e.key)===0){e.clashAny=true;if(o.chain!==e.chain)e.clashOther=true;}});
   });
-  function family(d){return FAM[d.chain]||[d];}
-  // What to put in the search for one entry: the name when it's exact, otherwise Pokédex numbers.
+  // What to put in the search for one entry: the name, unless it would also match a Pokémon
+  // from a different evolution family (e.g. "mew" finds Mewtwo) or has spaces/punctuation;
+  // then the Pokédex number. Names keep the game's "show evolutions" option working.
   function termsOf(e){
     var d=find(e.name);if(!d)return [e.name];
-    if(e.family){
-      if(family(d).length<2)return termsOf({name:e.name,forms:e.forms});
-      if(d.safe&&!d.clashOther)return ["+"+d.key];
-      return family(d).map(function(m){return String(m.num);});
-    }
-    return (d.safe&&!d.clashAny)?[d.key]:[String(d.num)];
+    return (d.safe&&!d.clashOther)?[d.key]:[String(d.num)];
   }
-  function formsAvail(e){
-    var d=find(e.name);if(!d)return ORDER;
-    var f=[];(e.family?family(d):[d]).forEach(function(m){m.forms.forEach(function(x){if(f.indexOf(x)<0)f.push(x);});});
-    return ORDER.filter(function(x){return f.indexOf(x)>-1;});
-  }
+  function formsAvail(e){var d=find(e.name);return d?d.forms:ORDER;}
   function find(n){return BY[norm(n)]||null;}
   function clean(n){return norm(n).replace(/[&,!;~:|#]/g,"").slice(0,30).trim();}
 
@@ -555,7 +545,7 @@ document.getElementById("share").addEventListener("click",function(){
   // older saved lists used {name, form}
   list=list.map(function(e){
     var f=Array.isArray(e.forms)?e.forms:(e.form?[e.form]:[]);
-    return {name:clean(e.name),forms:f.filter(function(x){return ORDER.indexOf(x)>-1;}),family:!!e.family};
+    return {name:clean(e.name),forms:f.filter(function(x){return ORDER.indexOf(x)>-1;})};
   }).filter(function(e){return e.name;});
 
   var nameIn=document.getElementById("tl-name"),sug=document.getElementById("tl-sug"),msg=document.getElementById("tl-msg");
@@ -564,11 +554,10 @@ document.getElementById("share").addEventListener("click",function(){
 
   // "hisuian voltorb" / "voltorb hisui" -> {name:"voltorb", forms:["hisui"]}
   function parseOne(txt){
-    var t=norm(txt),fam=false;
-    if(t.charAt(0)==="+"){fam=true;t=t.slice(1);}
+    var t=norm(txt).replace(/^\+/,"");
     var words=t.split(" "),forms=[],rest=[];
     words.forEach(function(w){if(WORDS[w]&&forms.indexOf(WORDS[w])<0)forms.push(WORDS[w]);else if(w)rest.push(w);});
-    return {name:clean(rest.join(" ").replace(/^\+/,"")),forms:forms,family:fam};
+    return {name:clean(rest.join(" ")),forms:forms};
   }
   function keyOf(e){var d=find(e.name);return d?String(d.num):e.name;}
   function pushAll(arr,items){items.forEach(function(x){if(arr.indexOf(x)<0)arr.push(x);});}
@@ -605,10 +594,10 @@ document.getElementById("share").addEventListener("click",function(){
     if(!e.name)return;
     var ex=null;list.forEach(function(x){if(keyOf(x)===keyOf(e))ex=x;});
     var d=find(e.name);
-    var avail=formsAvail({name:e.name,family:!!e.family});
+    var avail=formsAvail({name:e.name});
     var forms=e.forms.filter(function(f){return avail.indexOf(f)>-1;});
-    if(ex){forms.forEach(function(f){if(ex.forms.indexOf(f)<0)ex.forms.push(f);});if(e.family)ex.family=true;}
-    else list.push({name:d?d.key:e.name,forms:forms,family:!!e.family});
+    if(ex){forms.forEach(function(f){if(ex.forms.indexOf(f)<0)ex.forms.push(f);});}
+    else list.push({name:d?d.key:e.name,forms:forms});
   }
   function setMsg(text,buttons){
     msg.innerHTML="";if(!text)return;
@@ -677,23 +666,11 @@ document.getElementById("share").addEventListener("click",function(){
       var d=find(e.name);
       var row=document.createElement("div");row.className="tl-item";
       var nm=document.createElement("span");nm.className="nm";nm.textContent=displayName(e);
-      if(d){var n=document.createElement("small");n.textContent="#"+d.num;nm.appendChild(n);
-        if(e.family&&family(d).length>1){var fm=document.createElement("span");fm.className="fam";fm.textContent="with "+family(d).filter(function(m){return m!==d;}).map(function(m){return m.name;}).join(", ");nm.appendChild(fm);}}
+      if(d){var n=document.createElement("small");n.textContent="#"+d.num;nm.appendChild(n);}
       else{var bad=document.createElement("span");bad.className="bad";bad.textContent="Not a Pokémon name – check the spelling";nm.appendChild(bad);}
       var top=document.createElement("div");top.className="tl-top";top.appendChild(nm);row.appendChild(top);
       var avail=formsAvail(e);
       var fw=document.createElement("div");fw.className="tl-forms";
-      if(d&&family(d).length>1){
-        var ev=document.createElement("button");ev.type="button";ev.className="fchip evo"+(e.family?" on":"");
-        ev.textContent="+ evolutions";ev.setAttribute("aria-pressed",e.family?"true":"false");
-        ev.title="Also include the rest of its evolution family: "+family(d).map(function(m){return m.name;}).join(", ");
-        ev.addEventListener("click",function(){
-          e.family=!e.family;
-          var av=formsAvail(e);e.forms=e.forms.filter(function(f){return av.indexOf(f)>-1;});
-          save();
-        });
-        fw.appendChild(ev);
-      }
       if(avail.length){
         [""].concat(avail).forEach(function(f){
           var c=document.createElement("button");c.type="button";c.className="fchip";
@@ -718,9 +695,7 @@ document.getElementById("share").addEventListener("click",function(){
       box.appendChild(row);
       // other regional forms of this Pokémon that sneak in because another entry uses that region
       if(d&&e.forms.length){
-        (e.family?family(d):[d]).forEach(function(m){
-          m.forms.forEach(function(f){if(e.forms.indexOf(f)<0&&R.indexOf(f)>-1)warnings.push(LABEL[f]+" "+m.name);});
-        });
+        d.forms.forEach(function(f){if(e.forms.indexOf(f)<0&&R.indexOf(f)>-1)warnings.push(LABEL[f]+" "+d.name);});
       }
     });
     warn.textContent=warnings.length?"Heads up: "+warnings.join(", ")+(warnings.length>1?" will":" will")+" also show up, because another Pokémon on the list uses that region. The game can't separate these in one search.":"";
@@ -729,12 +704,12 @@ document.getElementById("share").addEventListener("click",function(){
   function save(){store(KEY,list.length?list:null);draw();}
 
   // share links: #t=voltorb~hisui,vulpix~alola,flamigo
-  function shareCode(){return list.map(function(e){var t=e.forms.slice();if(e.family)t.push("evo");return e.name+(t.length?"~"+t.join("+"):"");}).join(",");}
+  function shareCode(){return list.map(function(e){return e.name+(e.forms.length?"~"+e.forms.join("+"):"");}).join(",");}
   function loadShared(code){
     var items=String(code).split(",").slice(0,200).map(function(x){
       var bits=x.split("~");
       var t=(bits[1]||"").split("+");
-      return {name:clean(bits[0]),forms:t.filter(function(f){return ORDER.indexOf(f)>-1;}),family:t.indexOf("evo")>-1};
+      return {name:clean(bits[0]),forms:t.filter(function(f){return ORDER.indexOf(f)>-1;})};
     }).filter(function(e){return e.name;});
     if(!items.length)return;
     list=[];items.forEach(addEntry);save();
@@ -770,7 +745,7 @@ document.getElementById("share").addEventListener("click",function(){
   document.getElementById("tl-share").addEventListener("click",function(){
     var b=this;if(!list.length){flash(b,"Add a Pokémon first");return;}
     var url=location.origin+location.pathname+"#t="+encodeURIComponent(shareCode());
-    var names=list.map(function(e){return (e.forms.length?e.forms.map(function(f){return LABEL[f];}).join("/")+" ":"")+displayName(e)+(e.family?" (+ evolutions)":"");}).join(", ");
+    var names=list.map(function(e){return (e.forms.length?e.forms.map(function(f){return LABEL[f];}).join("/")+" ":"")+displayName(e);}).join(", ");
     track("trade-list-share","Shared a trade list");
     if(navigator.share)navigator.share({title:"My Pokémon GO trade list",text:"Pokémon I'm after: "+names+". Open the link and tap Copy to search for them:",url:url}).catch(function(){});
     else if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(url).then(function(){flash(b,"Link copied!");},function(){prompt("Copy this link:",url);});
