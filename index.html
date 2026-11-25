@@ -52,13 +52,26 @@
   .mode button.on[data-m="ex"]{background:var(--ex);color:#fff;border-color:var(--ex)}
   .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
   .how{margin:0 2px 12px}
-  .tl-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-  .tl-row input{flex:1 1 140px;min-width:0}
-  .tl-row select{flex:0 1 auto;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:16px}
+  .tl-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;position:relative}
+  .tl-row input{flex:1;min-width:0}
+  .tl-sug{position:absolute;left:0;right:70px;top:100%;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.15);overflow:hidden;display:none}
+  .tl-sug.show{display:block}
+  .tl-sug button{display:block;width:100%;text-align:left;border:0;border-radius:0;border-bottom:1px solid var(--line);padding:10px 12px;background:transparent}
+  .tl-sug button:last-child{border-bottom:0}
+  .tl-sug small{color:var(--muted);margin-left:6px}
+  .tl-msg{font-size:13px;margin:-2px 2px 8px;color:var(--muted)}
+  .tl-msg:empty{display:none}
+  .tl-msg button{padding:4px 10px;margin:4px 4px 0 0;font-size:13px}
   .tl-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-  .tl-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px}
-  .tl-item span{flex:1}
-  .tl-item small{color:var(--muted)}
+  .tl-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;flex-wrap:wrap}
+  .tl-item .nm{flex:1;min-width:110px;font-weight:600}
+  .tl-item .nm small{font-weight:400;color:var(--muted);margin-left:4px}
+  .tl-item .bad{display:block;font-weight:400;font-size:12px;color:var(--ex)}
+  .tl-forms{display:flex;gap:4px;flex-wrap:wrap}
+  .fchip{padding:5px 10px;font-size:13px;border-radius:999px}
+  .fchip.on{background:var(--any);border-color:var(--any);color:#fff}
+  .tl-warn{font-size:13px;color:var(--ex);margin:0 2px 8px}
+  .tl-warn:empty{display:none}
   .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
   main{padding:12px 14px 60px;max-width:900px;margin:0 auto}
   #filter{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:10px}
@@ -165,22 +178,18 @@
 
   <details class="sec" id="trade-sec">
     <summary>Trade list builder (pick regional forms)</summary>
-    <p class="hint" style="margin-top:0">Add the Pokémon you want and choose a form for each. It builds a string that keeps only the forms you picked, e.g. Hisuian Voltorb but not Kanto Voltorb.</p>
+    <p class="hint" style="margin-top:0">Add the Pokémon you want, then tap the form for each, e.g. Hisuian Voltorb but not Kanto Voltorb. Send the list to a friend with “Share list”.</p>
     <div class="tl-row">
-      <input id="tl-name" placeholder="Pokémon name, e.g. voltorb" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="30">
-      <select id="tl-form" aria-label="Form">
-        <option value="">Any form</option>
-        <option value="alola">Alolan</option>
-        <option value="galar">Galarian</option>
-        <option value="hisui">Hisuian</option>
-        <option value="paldea">Paldean</option>
-      </select>
+      <input id="tl-name" placeholder="Type a name, or paste a list" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="2000" aria-label="Pokémon name">
       <button id="tl-add" type="button">Add</button>
+      <div class="tl-sug" id="tl-sug" role="listbox"></div>
     </div>
+    <div class="tl-msg" id="tl-msg"></div>
     <div class="tl-list" id="tl-list"></div>
+    <div class="tl-warn" id="tl-warn"></div>
     <div class="tl-out" id="tl-out"></div>
-    <div class="brow"><button id="tl-copy" type="button">Copy</button><button id="tl-use" type="button">Open in builder</button><button id="tl-clear" type="button">Clear list</button></div>
-    <div class="hint">How it works: every Pokémon goes in the first group; the second group holds the regions you picked plus any “any form” names, so each Pokémon has to pass both. One catch: regions apply to the whole list, so if you pick Galarian Meowth and Alolan Vulpix, Alolan Meowth will show up too. Use “Open in builder” to add extras like <code>!traded</code>.</div>
+    <div class="brow"><button id="tl-copy" type="button">Copy</button><button id="tl-share" type="button">Share list</button><button id="tl-use" type="button">Open in builder</button><button id="tl-clear" type="button">Clear list</button></div>
+    <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. The search uses Pokédex numbers, so Mew won't also bring up Mewtwo, and it works in any game language. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
@@ -216,6 +225,7 @@
   </footer>
 </main>
 
+<script src="pokemon-data.js"></script>
 <script>
 const TYPES=["normal","fire","water","grass","electric","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
 const r=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
@@ -500,64 +510,235 @@ document.getElementById("share").addEventListener("click",function(){
 
 // ---------- trade list builder ----------
 (function(){
-  var KEY="pgs-tradelist",FORMS={"":"Any form",alola:"Alolan",galar:"Galarian",hisui:"Hisuian",paldea:"Paldean"};
-  var list=recall(KEY,[]);if(!Array.isArray(list))list=[];
-  var nameIn=document.getElementById("tl-name"),formIn=document.getElementById("tl-form"),box=document.getElementById("tl-list"),out=document.getElementById("tl-out");
-  function clean(n){return String(n||"").toLowerCase().replace(/[&,!]/g,"").trim().slice(0,30);}
-  function tradeString(){
-    var names=[],regions=[],anyNames=[];
-    list.forEach(function(e){
-      if(names.indexOf(e.name)<0)names.push(e.name);
-      if(e.form){if(regions.indexOf(e.form)<0)regions.push(e.form);}
-      else if(anyNames.indexOf(e.name)<0)anyNames.push(e.name);
-    });
-    if(!names.length)return "";
-    if(!regions.length)return names.join(",");
-    return names.join(",")+"&"+regions.concat(anyNames).join(",");
+  var KEY="pgs-tradelist",ORDER=["alola","galar","hisui","paldea"];
+  var LABEL={alola:"Alolan",galar:"Galarian",hisui:"Hisuian",paldea:"Paldean"};
+  var CODE={a:"alola",g:"galar",h:"hisui",p:"paldea"};
+  var WORDS={alolan:"alola",alola:"alola",galarian:"galar",galar:"galar",hisuian:"hisui",hisui:"hisui",paldean:"paldea",paldea:"paldea"};
+  // dex lookup: lowercase name -> {num, name, forms[]}
+  var DEX=Array.isArray(window.PGS_DEX)?window.PGS_DEX:[],BY={},ALL=[];
+  function norm(n){return String(n||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").trim();}
+  DEX.forEach(function(d,i){
+    var e={num:i+1,name:d[0],key:norm(d[0]),forms:d[1].split("").map(function(c){return CODE[c];})};
+    BY[e.key]=e;ALL.push(e);
+  });
+  function find(n){return BY[norm(n)]||null;}
+  function clean(n){return norm(n).replace(/[&,!;~:|#]/g,"").slice(0,30).trim();}
+
+  var list=recall(KEY,[]);
+  if(!Array.isArray(list))list=[];
+  // older saved lists used {name, form}
+  list=list.map(function(e){
+    var f=Array.isArray(e.forms)?e.forms:(e.form?[e.form]:[]);
+    return {name:clean(e.name),forms:f.filter(function(x){return ORDER.indexOf(x)>-1;})};
+  }).filter(function(e){return e.name;});
+
+  var nameIn=document.getElementById("tl-name"),sug=document.getElementById("tl-sug"),msg=document.getElementById("tl-msg");
+  var box=document.getElementById("tl-list"),warn=document.getElementById("tl-warn"),out=document.getElementById("tl-out");
+  var sec=document.getElementById("trade-sec");
+
+  // "hisuian voltorb" / "voltorb hisui" -> {name:"voltorb", forms:["hisui"]}
+  function parseOne(txt){
+    var words=norm(txt).split(" "),forms=[],rest=[];
+    words.forEach(function(w){if(WORDS[w]&&forms.indexOf(WORDS[w])<0)forms.push(WORDS[w]);else if(w)rest.push(w);});
+    return {name:clean(rest.join(" ")),forms:forms};
   }
+  function keyOf(e){var d=find(e.name);return d?String(d.num):e.name;}
+  function displayName(e){var d=find(e.name);return d?d.name:e.name;}
+
+  function regionsUsed(){
+    var r=[];list.forEach(function(e){e.forms.forEach(function(f){if(r.indexOf(f)<0)r.push(f);});});
+    return ORDER.filter(function(f){return r.indexOf(f)>-1;});
+  }
+  function tradeString(){
+    if(!list.length)return "";
+    var g1=[],anyKeys=[];
+    list.forEach(function(e){var k=keyOf(e);if(g1.indexOf(k)<0)g1.push(k);if(!e.forms.length&&anyKeys.indexOf(k)<0)anyKeys.push(k);});
+    var R=regionsUsed();
+    if(!R.length)return g1.join(",");
+    return g1.join(",")+"&"+R.concat(anyKeys).join(",");
+  }
+
+  // spelling help: closest names by edit distance
+  function dist(a,b){
+    var m=a.length,n=b.length,prev=[],cur=[],i,j;
+    for(j=0;j<=n;j++)prev[j]=j;
+    for(i=1;i<=m;i++){cur=[i];for(j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur;}
+    return prev[n];
+  }
+  function closest(n){
+    n=norm(n);
+    return ALL.map(function(e){return {e:e,d:dist(n,e.key)};})
+      .filter(function(x){return x.d<=Math.max(2,Math.floor(n.length/3));})
+      .sort(function(a,b){return a.d-b.d;}).slice(0,3).map(function(x){return x.e;});
+  }
+
+  function addEntry(e){
+    if(!e.name)return;
+    var ex=null;list.forEach(function(x){if(keyOf(x)===keyOf(e))ex=x;});
+    var d=find(e.name);
+    var forms=d?e.forms.filter(function(f){return d.forms.indexOf(f)>-1;}):e.forms;
+    if(ex){forms.forEach(function(f){if(ex.forms.indexOf(f)<0)ex.forms.push(f);});}
+    else list.push({name:d?d.key:e.name,forms:forms});
+  }
+  function setMsg(text,buttons){
+    msg.innerHTML="";if(!text)return;
+    var t=document.createElement("span");t.textContent=text+" ";msg.appendChild(t);
+    (buttons||[]).forEach(function(b){
+      var el=document.createElement("button");el.type="button";el.textContent=b.label;
+      el.addEventListener("click",b.go);msg.appendChild(el);
+    });
+  }
+
+  // Add whatever is in the box. Unknown names are held back with spelling suggestions.
+  function addFromBox(force){
+    var raw=nameIn.value;
+    var parts=raw.split(/[,;\n&]+/).map(parseOne).filter(function(p){return p.name;});
+    if(!parts.length){nameIn.focus();flash(document.getElementById("tl-add"),"Enter a name");return;}
+    var unknown=[];
+    parts.forEach(function(p){if(find(p.name)||force)addEntry(p);else unknown.push(p);});
+    hideSug();
+    if(unknown.length){
+      nameIn.value=unknown.map(function(p){return p.forms.map(function(f){return LABEL[f].toLowerCase();}).concat([p.name]).join(" ");}).join(", ");
+      var first=unknown[0],sugg=closest(first.name);
+      var btns=sugg.map(function(s){return {label:s.name,go:function(){
+        addEntry({name:s.key,forms:first.forms});
+        unknown.shift();
+        nameIn.value=unknown.map(function(p){return p.name;}).join(", ");
+        save();setMsg("");if(unknown.length)addFromBox(false);
+      }};});
+      btns.push({label:"Add anyway",go:function(){addFromBox(true);}});
+      setMsg("“"+first.name+"” isn't a Pokémon name."+(sugg.length?" Did you mean:":""),btns);
+    }else{nameIn.value="";setMsg("");}
+    save();
+  }
+
+  // suggestions while typing (works on the last item when pasting a list)
+  function hideSug(){sug.classList.remove("show");sug.innerHTML="";}
+  function showSug(){
+    var seg=nameIn.value.split(/[,;\n&]/).pop(),p=parseOne(seg),q=p.name;
+    if(!q){hideSug();return;}
+    var starts=[],contains=[];
+    ALL.forEach(function(e){var i=e.key.indexOf(q);if(i===0)starts.push(e);else if(i>0&&q.length>=3)contains.push(e);});
+    var hits=starts.concat(contains).slice(0,6);
+    if(!hits.length||(hits.length===1&&hits[0].key===q)){hideSug();return;}
+    sug.innerHTML="";
+    hits.forEach(function(e){
+      var b=document.createElement("button");b.type="button";b.setAttribute("role","option");
+      b.textContent=e.name;
+      if(e.forms.length){var s=document.createElement("small");s.textContent=e.forms.map(function(f){return LABEL[f];}).join(" / ")+" form";b.appendChild(s);}
+      b.addEventListener("pointerdown",function(ev){ev.preventDefault();});
+      b.addEventListener("click",function(){
+        var segs=nameIn.value.split(/([,;\n&])/);segs.pop();
+        var before=segs.join("");
+        addEntry({name:e.key,forms:p.forms});
+        nameIn.value=before.replace(/[,;\n&\s]+$/,"");
+        if(nameIn.value)addFromBox(false);else{save();setMsg("");}
+        hideSug();nameIn.focus();
+      });
+      sug.appendChild(b);
+    });
+    sug.classList.add("show");
+  }
+
   function draw(){
     box.innerHTML="";
+    var R=regionsUsed(),warnings=[];
     list.forEach(function(e,i){
+      var d=find(e.name);
       var row=document.createElement("div");row.className="tl-item";
-      var t=document.createElement("span");t.textContent=e.name+" ";
-      var f=document.createElement("small");f.textContent=FORMS[e.form]||"Any form";t.appendChild(f);
+      var nm=document.createElement("span");nm.className="nm";nm.textContent=displayName(e);
+      if(d){var n=document.createElement("small");n.textContent="#"+d.num;nm.appendChild(n);}
+      else{var bad=document.createElement("span");bad.className="bad";bad.textContent="Not a Pokémon name – check the spelling";nm.appendChild(bad);}
+      row.appendChild(nm);
+      var avail=d?d.forms:ORDER;
+      if(avail.length){
+        var fw=document.createElement("div");fw.className="tl-forms";
+        [""].concat(avail).forEach(function(f){
+          var c=document.createElement("button");c.type="button";c.className="fchip";
+          var on=f?e.forms.indexOf(f)>-1:!e.forms.length;
+          if(on)c.classList.add("on");
+          c.textContent=f?LABEL[f]:"Any form";
+          c.setAttribute("aria-pressed",on?"true":"false");
+          c.addEventListener("click",function(){
+            if(!f)e.forms=[];
+            else if(e.forms.indexOf(f)>-1)e.forms.splice(e.forms.indexOf(f),1);
+            else e.forms.push(f);
+            save();
+          });
+          fw.appendChild(c);
+        });
+        row.appendChild(fw);
+      }
       var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
-      del.setAttribute("aria-label","Remove "+e.name);
+      del.setAttribute("aria-label","Remove "+displayName(e));
       del.addEventListener("click",function(){list.splice(i,1);save();});
-      row.appendChild(t);row.appendChild(del);box.appendChild(row);
+      row.appendChild(del);
+      box.appendChild(row);
+      // other regional forms of this Pokémon that sneak in because another entry uses that region
+      if(d&&e.forms.length){
+        d.forms.forEach(function(f){if(e.forms.indexOf(f)<0&&R.indexOf(f)>-1)warnings.push(LABEL[f]+" "+d.name);});
+      }
     });
-    var str=tradeString();
-    out.textContent=str||"Add a Pokémon to start.";
+    warn.textContent=warnings.length?"Heads up: "+warnings.join(", ")+(warnings.length>1?" will":" will")+" also show up, because another Pokémon on the list uses that region. The game can't separate these in one search.":"";
+    out.textContent=tradeString()||"Add a Pokémon to start.";
   }
   function save(){store(KEY,list.length?list:null);draw();}
-  function add(){
-    var n=clean(nameIn.value),f=formIn.value,b=document.getElementById("tl-add");
-    if(!n){nameIn.focus();flash(b,"Enter a name");return;}
-    if(!(f in FORMS))f="";
-    var dup=list.some(function(e){return e.name===n&&e.form===f;});
-    if(!dup)list.push({name:n,form:f});
-    nameIn.value="";formIn.value="";nameIn.focus();save();
+
+  // share links: #t=voltorb~hisui,vulpix~alola,flamigo
+  function shareCode(){return list.map(function(e){return e.name+(e.forms.length?"~"+e.forms.join("+"):"");}).join(",");}
+  function loadShared(code){
+    var items=String(code).split(",").slice(0,200).map(function(x){
+      var bits=x.split("~");
+      return {name:clean(bits[0]),forms:(bits[1]||"").split("+").filter(function(f){return ORDER.indexOf(f)>-1;})};
+    }).filter(function(e){return e.name;});
+    if(!items.length)return;
+    list=[];items.forEach(addEntry);save();
+    sec.open=true;
+    setMsg("Loaded a shared trade list with "+list.length+" Pokémon. Tap Copy, then paste it into the game.");
+    track("trade-list-opened-share","Opened a shared trade list");
+    setTimeout(function(){sec.scrollIntoView({behavior:"smooth",block:"start"});},300);
   }
-  document.getElementById("tl-add").addEventListener("click",add);
-  nameIn.addEventListener("keydown",function(e){if(e.key==="Enter")add();});
+  function readHash(){
+    var m=location.hash.match(/^#t=(.*)$/);if(!m)return;
+    try{loadShared(decodeURIComponent(m[1]));}catch(e){}
+  }
+
+  nameIn.addEventListener("input",showSug);
+  nameIn.addEventListener("focus",showSug);
+  nameIn.addEventListener("blur",function(){setTimeout(hideSug,150);});
+  nameIn.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){e.preventDefault();addFromBox(false);}
+    else if(e.key==="Escape")hideSug();
+  });
+  document.getElementById("tl-add").addEventListener("click",function(){addFromBox(false);});
   document.getElementById("tl-clear").addEventListener("click",function(){
     var b=this;if(!list.length)return;
     if(b.textContent!=="Sure?"){b.textContent="Sure?";setTimeout(function(){b.textContent="Clear list";},2500);return;}
-    list=[];b.textContent="Clear list";save();
+    list=[];b.textContent="Clear list";setMsg("");save();
   });
   document.getElementById("tl-copy").addEventListener("click",function(){
     var b=this,str=tradeString();if(!str){flash(b,"Add a Pokémon first");return;}
     track("trade-list-copy","Copied a trade list");
-    var done=function(){flash(b,"Copied!");};
-    if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(done,function(){prompt("Copy this:",str);});
+    if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(function(){flash(b,"Copied!");},function(){prompt("Copy this:",str);});
     else prompt("Copy this:",str);
+  });
+  document.getElementById("tl-share").addEventListener("click",function(){
+    var b=this;if(!list.length){flash(b,"Add a Pokémon first");return;}
+    var url=location.origin+location.pathname+"#t="+encodeURIComponent(shareCode());
+    var names=list.map(function(e){return (e.forms.length?e.forms.map(function(f){return LABEL[f];}).join("/")+" ":"")+displayName(e);}).join(", ");
+    track("trade-list-share","Shared a trade list");
+    if(navigator.share)navigator.share({title:"My Pokémon GO trade list",text:"Pokémon I'm after: "+names+". Open the link and tap Copy to search for them:",url:url}).catch(function(){});
+    else if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(url).then(function(){flash(b,"Link copied!");},function(){prompt("Copy this link:",url);});
+    else prompt("Copy this link:",url);
   });
   document.getElementById("tl-use").addEventListener("click",function(){
     var str=tradeString();if(!str){flash(this,"Add a Pokémon first");return;}
     loadString(str);track("trade-list-open","Opened a trade list in the builder");
     window.scrollTo({top:0,behavior:"smooth"});
   });
+  window.addEventListener("hashchange",readHash);
   draw();
+  readHash();
 })();
 
 // ---------- 6. paste to edit ----------

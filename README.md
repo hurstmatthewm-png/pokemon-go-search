@@ -17,7 +17,7 @@ Build Pokémon GO search strings by tapping instead of typing. Pick what you wan
 - Picks up where you left off
 - Share a search as a link
 - Paste in any search string to edit it
-- Trade list builder: pick regional forms (e.g. Hisuian Voltorb but not Kanto Voltorb)
+- Trade list builder: pick regional forms (e.g. Hisuian Voltorb but not Kanto Voltorb), with name suggestions, spell-checking and shareable lists
 - Works offline once you've opened it
 - Works on any phone; add it to your home screen to use it like an app
 - Free, no sign-up, no cookies
@@ -29,6 +29,8 @@ In Pokémon GO, `&` means AND, `,` means OR and `!` means NOT. Commas group befo
 ## Support
 
 If it saves you time, you can [buy me a coffee](https://buymeacoffee.com/muttchew) ☕
+
+Pokémon names and regional form data from [PokéAPI](https://github.com/PokeAPI/pokeapi) (BSD-3-Clause).
 
 ---
 
