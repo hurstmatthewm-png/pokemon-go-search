@@ -52,6 +52,10 @@
   .mode button.on[data-m="ex"]{background:var(--ex);color:#fff;border-color:var(--ex)}
   .hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
   .how{margin:0 2px 12px}
+  .explain{font-size:13px;color:var(--muted);margin:-2px 2px 8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .explain:empty{display:none}
+  .explain b{color:var(--ink);font-weight:600}
+  .gnote{font-size:12px;color:var(--muted);margin:6px 2px 0}
   .tl-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;position:relative}
   .tl-row input{flex:1;min-width:0}
   .tl-sug{position:absolute;left:0;right:70px;top:100%;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.15);overflow:hidden;display:none}
@@ -129,6 +133,7 @@
     <textarea id="output" rows="2" readonly placeholder="Tap terms below to build your search…"></textarea>
     <button class="primary" id="copy">Copy</button>
   </div>
+  <div class="explain" id="explain" aria-live="polite"></div>
   <div class="row mode" id="mode">
     <button data-m="must" class="on">✓ Must have</button>
     <button data-m="any">∨ Any of</button>
@@ -142,16 +147,16 @@
 </header>
 
 <main>
-  <p class="hint how">Pick a mode at the top, then tap terms. Tap a selected term again to remove it, or tap it in another mode to switch it. “Must have” terms all apply; “Any of” terms are grouped so one is enough; “Exclude” terms are each removed.</p>
-  <details class="sec" id="presets-sec" open>
+  <p class="hint how">Pick a mode at the top, then tap terms below. Tap a term again to remove it. Search words are in English; symbols and numbers (like <code>4*</code> or <code>!</code>) work in any game language.</p>
+  <details class="sec" id="presets-sec">
     <summary>Ready-made searches</summary>
     <div class="presets">
-      <button class="preset" data-str="0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs" data-name="Transfer junk"><b>Transfer junk</b><small>Low-star Pokémon with nothing special about them</small><code>0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs</code></button>
+      <button class="preset" data-str="0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs" data-name="Transfer junk"><b>Transfer junk</b><small>Low-star Pokémon with nothing special about them. Always look over the results before transferring.</small><code>0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs</code></button>
       <button class="preset" data-str="4*" data-name="Perfect IVs (hundos)"><b>Perfect IVs (hundos)</b><small>Every 4-star Pokémon</small><code>4*</code></button>
       <button class="preset" data-str="0attack&amp;0defense&amp;0hp" data-name="Zero IVs (nundos)"><b>Zero IVs (nundos)</b><small>0 Attack, 0 Defense, 0 HP</small><code>0attack&amp;0defense&amp;0hp</code></button>
-      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500" data-name="Great League candidates"><b>Great League candidates</b><small>Low Attack, high Defense and HP, 1500 CP or less</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500</code></button>
-      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500" data-name="Ultra League candidates"><b>Ultra League candidates</b><small>Low Attack, high Defense and HP, 2500 CP or less</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500</code></button>
-      <button class="preset" data-str="year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite" data-name="Lucky trade fodder"><b>Lucky trade fodder</b><small>Older Pokémon that haven&#x27;t been traded yet</small><code>year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite</code></button>
+      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500" data-name="Great League candidates"><b>Great League candidates</b><small>An IV shape for PvP (low Attack, high Defense and HP, 1500 CP or less), not a list of good Great League Pokémon. Check the species too.</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-1500</code></button>
+      <button class="preset" data-str="0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500" data-name="Ultra League candidates"><b>Ultra League candidates</b><small>An IV shape for PvP (low Attack, high Defense and HP, 2500 CP or less), not a list of good Ultra League Pokémon. Check the species too.</small><code>0-1attack&amp;3-4defense&amp;3-4hp&amp;cp-2500</code></button>
+      <button class="preset" data-str="year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite" data-name="Lucky trade fodder"><b>Lucky trade fodder</b><small>Old Pokémon (2016–2019) not yet traded. Trading old Pokémon gives a much better chance of a lucky trade.</small><code>year2016,year2017,year2018,year2019&amp;!traded&amp;!mythical&amp;!favorite</code></button>
       <button class="preset" data-str="shiny&amp;!traded&amp;!favorite&amp;!legendary&amp;!mythical" data-name="Shinies to trade"><b>Shinies to trade</b><small>Untraded shinies that aren&#x27;t favourites</small><code>shiny&amp;!traded&amp;!favorite&amp;!legendary&amp;!mythical</code></button>
       <button class="preset" data-str="tradeevolve&amp;!traded" data-name="Free trade evolutions"><b>Free trade evolutions</b><small>Evolve for free after trading</small><code>tradeevolve&amp;!traded</code></button>
       <button class="preset" data-str="evolvenew" data-name="New Pokédex entries"><b>New Pokédex entries</b><small>Evolve these to fill your Pokédex</small><code>evolvenew</code></button>
@@ -161,7 +166,32 @@
       <button class="preset" data-str="countcandyxl296-" data-name="Enough XL candy for level 50"><b>Enough XL candy for level 50</b><small>296+ XL candy: enough to take a Pokémon from level 40 to 50</small><code>countcandyxl296-</code></button>
     </div>
     <button id="more-presets" type="button">Show all 12</button>
-    <div class="hint">Tap one to load it, then add or remove terms below to make it your own.</div>
+    <div class="hint">Tap one to load it, then add or remove terms below to make it your own. Always check the results in the game before transferring anything.</div>
+  </details>
+
+  <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
+
+  <section id="added-sec" class="hidden">
+    <h2>Your added terms</h2>
+    <div class="chips" id="added"></div>
+  </section>
+
+  <div id="lists"></div>
+
+  <details class="sec" id="ranges-sec">
+    <summary>Number ranges, tags &amp; move names</summary>
+    <div class="builder">
+      <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
+      <div class="brow"><label>HP</label><input id="hp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="hp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="hp">Add</button></div>
+      <div class="brow"><label>Distance (km)</label><input id="distance-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="distance-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="distance">Add</button></div>
+      <div class="brow"><label>Candy</label><input id="candy-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candy-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candy">Add</button></div>
+      <div class="brow"><label>XL candy</label><input id="candyxl-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candyxl-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candyxl">Add</button></div>
+      <div class="brow"><label>Age (days)</label><input id="age-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="age-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="age">Add</button></div>
+      <div class="brow"><label>Pokédex no.</label><input id="dex-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="from"><span>to</span><input id="dex-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="to"><button data-add="dex">Add</button></div>
+      <div class="brow"><label>Tag</label><input id="tag" class="wide" placeholder="e.g. pvp"><button data-add="tag">Add</button></div>
+      <div class="brow"><label>Move name</label><input id="move" class="wide" placeholder="e.g. counter"><button data-add="move">Add</button></div>
+    </div>
+    <div class="hint">Leave “max” empty for “this or higher”, or “min” empty for “this or lower”. Added terms use the current mode. Tap ✕ to delete one.</div>
   </details>
 
   <section id="saved-sec">
@@ -170,12 +200,6 @@
     <div class="brow"><input id="save-name" class="wide" maxlength="40" placeholder="Name it, e.g. PvP keepers"><button id="save-btn">Save current</button></div>
     <div class="hint">Saved on this phone or computer only. No account needed.</div>
   </section>
-
-  <details class="sec" id="paste-sec">
-    <summary>Paste a search string to edit it</summary>
-    <div class="brow"><input id="paste-in" class="wide" placeholder="e.g. 4*&amp;shiny,lucky&amp;!traded" autocapitalize="off" autocorrect="off" spellcheck="false"><button id="paste-btn">Load</button></div>
-    <div class="hint">Terms the builder knows light up below. Anything else (Pokémon names, ranges, tags) goes under “Your added terms”.</div>
-  </details>
 
   <details class="sec" id="trade-sec">
     <summary>Trade list builder (pick regional forms)</summary>
@@ -193,30 +217,15 @@
     <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Pokémon names are used so the game's “show evolutions” option still works; a few (like Mew, which would also find Mewtwo, or names with spaces such as Mr. Mime) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
-  <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
+  <details class="sec" id="paste-sec">
+    <summary>Paste a search string to edit it</summary>
+    <div class="brow"><input id="paste-in" class="wide" placeholder="e.g. 4*&amp;shiny,lucky&amp;!traded" autocapitalize="off" autocorrect="off" spellcheck="false"><button id="paste-btn">Load</button></div>
+    <div class="hint">Terms the builder knows light up below. Anything else (Pokémon names, ranges, tags) goes under “Your added terms”.</div>
+  </details>
 
-  <section id="added-sec" class="hidden">
-    <h2>Your added terms</h2>
-    <div class="chips" id="added"></div>
-  </section>
 
-  <section>
-    <h2>Add a number range or custom term</h2>
-    <div class="builder">
-      <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
-      <div class="brow"><label>HP</label><input id="hp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="hp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="hp">Add</button></div>
-      <div class="brow"><label>Distance (km)</label><input id="distance-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="distance-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="distance">Add</button></div>
-      <div class="brow"><label>Candy</label><input id="candy-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candy-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candy">Add</button></div>
-      <div class="brow"><label>XL candy</label><input id="candyxl-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="candyxl-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="candyxl">Add</button></div>
-      <div class="brow"><label>Age (days)</label><input id="age-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="age-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="age">Add</button></div>
-      <div class="brow"><label>Pokédex no.</label><input id="dex-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="from"><span>to</span><input id="dex-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="to"><button data-add="dex">Add</button></div>
-      <div class="brow"><label>Tag</label><input id="tag" class="wide" placeholder="e.g. pvp"><button data-add="tag">Add</button></div>
-      <div class="brow"><label>Move name</label><input id="move" class="wide" placeholder="e.g. counter"><button data-add="move">Add</button></div>
-    </div>
-    <div class="hint">Leave “max” empty for “this or higher”, or “min” empty for “this or lower”. Added terms use the current mode. Tap ✕ to delete one.</div>
-  </section>
 
-  <div id="lists"></div>
+
 
   <footer>
     <a class="coffee" href="https://buymeacoffee.com/muttchew" target="_blank" rel="noopener">☕ Found this useful? Buy me a coffee</a>
@@ -230,6 +239,8 @@
 <script>
 const TYPES=["normal","fire","water","grass","electric","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
 const r=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const STAR_PCT=["0–49%","51–64%","67–80%","82–98%","100% (hundo)"];
+const BAR_IV=["0","1–5","6–10","11–14","15"];
 
 const GROUPS=[
  {name:"Pokémon type",terms:TYPES.map(t=>[t])},
@@ -251,10 +262,12 @@ const GROUPS=[
    ["gbl","GO Battle League"],["rocket","Team GO Rocket"],["snapshot","photobomb"]]},
  {name:"Gender",terms:[["male"],["female"],["genderunknown","no gender"]]},
  {name:"Size",terms:[["xxs"],["xs"],["xl"],["xxl"]]},
- {name:"Appraisal – overall stars",terms:r(0,4).map(n=>[n+"*",n+" star"+(n==1?"":"s")])},
- {name:"Appraisal – Attack bars",terms:r(0,4).map(n=>[n+"attack"])},
- {name:"Appraisal – Defense bars",terms:r(0,4).map(n=>[n+"defense"])},
- {name:"Appraisal – HP bars",terms:r(0,4).map(n=>[n+"hp"])},
+ {name:"Appraisal – overall stars",terms:r(0,4).map(n=>[n+"*",STAR_PCT[n]]),
+  note:"Only 4★ is 100%. 3★ covers everything from 82% to 98%."},
+ {name:"Appraisal – Attack bars",terms:r(0,4).map(n=>[n+"attack","IV "+BAR_IV[n]])},
+ {name:"Appraisal – Defense bars",terms:r(0,4).map(n=>[n+"defense","IV "+BAR_IV[n]])},
+ {name:"Appraisal – HP bars",terms:r(0,4).map(n=>[n+"hp","IV "+BAR_IV[n]]),
+  note:"Each bar section is 5 IV points (stats go 0–15). Ranges work too, e.g. 0-1attack means Attack IV 0–5."},
  {name:"Buddy level",terms:r(0,5).map(n=>["buddy"+n,["not a buddy","Good","Great","Ultra","Best","Best (max)"][n]])},
  {name:"Year caught",terms:r(2016,new Date().getFullYear()).map(y=>["year"+y])},
  {name:"Moves – special",terms:[["@weather","weather-boosted move"],["@special","legacy / exclusive move"]]},
@@ -303,8 +316,56 @@ GROUPS.forEach(g=>{
   s.innerHTML=`<h2>${esc(g.name)}</h2>`;
   const c=document.createElement("div");c.className="chips";
   g.terms.forEach(([t,l])=>c.appendChild(chip(t,l)));
-  s.appendChild(c);lists.appendChild(s);
+  s.appendChild(c);
+  if(g.note){const n=document.createElement("p");n.className="gnote";n.textContent=g.note;s.appendChild(n);}
+  lists.appendChild(s);
 });
+
+// ---------- plain-English description of the current string ----------
+const LABEL_OF={};GROUPS.forEach(g=>g.terms.forEach(([t,l])=>{LABEL_OF[t]=l;}));
+const REGIONS=["kanto","johto","hoenn","sinnoh","unova","kalos","alola","galar","hisui","paldea"];
+const cap=w=>w.charAt(0).toUpperCase()+w.slice(1);
+function rng(x){ // "5-10" -> "5–10", "-10" -> "up to 10", "5-" -> "5 or more"
+  const m=String(x).match(/^(\d*)-(\d*)$/);if(!m)return x;
+  if(m[1]&&m[2])return m[1]+"–"+m[2];return m[1]?m[1]+" or more":"up to "+m[2];
+}
+function barRange(x){
+  const lo=[0,1,6,11,15],hi=[0,5,10,14,15];const m=String(x).match(/^(\d)(?:-(\d))?$/);
+  if(!m)return x;const a=+m[1],b=m[2]!==undefined?+m[2]:a;if(a>4||b>4)return x;
+  return lo[a]===hi[b]?String(lo[a]):lo[a]+"–"+hi[b];
+}
+function describe(t){
+  let m;
+  if((m=t.match(/^([0-4])\*$/)))return m[1]+"★ ("+STAR_PCT[+m[1]]+")";
+  if((m=t.match(/^([0-4](?:-[0-4])?)(attack|defense|hp)$/)))return cap(m[2])+" IV "+barRange(m[1]);
+  if((m=t.match(/^cp([\d-]+)$/)))return "CP "+rng(m[1]);
+  if((m=t.match(/^hp([\d-]+)$/)))return "HP "+rng(m[1]);
+  if((m=t.match(/^age([\d-]+)$/)))return "caught "+rng(m[1])+" days ago";
+  if((m=t.match(/^distance([\d-]+)$/)))return rng(m[1])+" km away";
+  if((m=t.match(/^countcandyxl([\d-]+)$/)))return rng(m[1])+" XL candy";
+  if((m=t.match(/^countcandy([\d-]+)$/)))return rng(m[1])+" candy";
+  if((m=t.match(/^year(\d{4})$/)))return "caught in "+m[1];
+  if((m=t.match(/^[\d-]+$/)))return "Pokédex #"+rng(t);
+  if((m=t.match(/^@([123])(\w+)$/))&&TYPES.includes(m[2]))return ["","fast","charged","second charged"][+m[1]]+" move is "+cap(m[2]);
+  if((m=t.match(/^@(\w+)$/))&&TYPES.includes(m[1]))return "has a "+cap(m[1])+" move";
+  if(TYPES.includes(t))return cap(t)+" type";
+  if(REGIONS.includes(t))return "from "+cap(t);
+  if(t==="#")return "has a tag";
+  if(t.charAt(0)==="#")return "tagged “"+t.slice(1)+"”";
+  if(t.charAt(0)==="+")return cap(t.slice(1))+" family";
+  if(LABEL_OF[t]&&!/^buddy\d$/.test(t))return t.charAt(0)==="@"?LABEL_OF[t]:LABEL_OF[t];
+  if((m=t.match(/^buddy(\d)$/)))return "buddy level: "+LABEL_OF[t];
+  if(t.charAt(0)==="@")return "knows "+cap(t.slice(1));
+  return t;
+}
+function explain(str){
+  if(!str)return "";
+  const parts=str.split("&").filter(Boolean).map(p=>{
+    if(p.includes(","))return "("+p.split(",").map(x=>x.charAt(0)==="!"?"not "+describe(x.slice(1)):describe(x)).join(" or ")+")";
+    return p.charAt(0)==="!"?"not "+describe(p.slice(1)):describe(p);
+  });
+  return parts.join(", ");
+}
 
 function render(){
   document.querySelectorAll(".chip").forEach(b=>{
@@ -313,6 +374,9 @@ function render(){
   });
   const {str,n}=build();
   document.getElementById("output").value=str;
+  const ex=document.getElementById("explain");
+  if(str){ex.innerHTML="";const b=document.createElement("b");b.textContent="Finds: ";ex.appendChild(b);ex.appendChild(document.createTextNode(explain(str)));}
+  else ex.textContent="";
   document.getElementById("count").textContent=n+" term"+(n==1?"":"s")+" selected";
 }
 
@@ -698,7 +762,10 @@ document.getElementById("share").addEventListener("click",function(){
         d.forms.forEach(function(f){if(e.forms.indexOf(f)<0&&R.indexOf(f)>-1)warnings.push(LABEL[f]+" "+d.name);});
       }
     });
-    warn.textContent=warnings.length?"Heads up: "+warnings.join(", ")+(warnings.length>1?" will":" will")+" also show up, because another Pokémon on the list uses that region. The game can't separate these in one search.":"";
+    var tauros=list.some(function(e){var d=find(e.name);return d&&d.key==="tauros"&&e.forms.indexOf("paldea")>-1;});
+    var taurosNote=tauros?" Note: Paldean Tauros has three breeds (Combat, Blaze and Aqua), and the search can't tell them apart.":"";
+    warn.textContent=(warnings.length?"Heads up: "+warnings.join(", ")+(warnings.length>1?" will":" will")+" also show up, because another Pokémon on the list uses that region. The game can't separate these in one search.":"")+taurosNote;
+    warn.textContent=warn.textContent.trim();
     out.textContent=tradeString()||"Add a Pokémon to start.";
   }
   function save(){store(KEY,list.length?list:null);draw();}
