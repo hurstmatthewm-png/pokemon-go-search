@@ -1,7 +1,7 @@
 // Lets the site open with no signal once it has been visited.
 // The page itself is fetched fresh when online (so updates show up straight away)
 // and falls back to the saved copy when offline.
-const CACHE = "pgs-v1";
+const CACHE = "pgs-v2";
 const FILES = [
   "./",
   "./index.html",
@@ -9,7 +9,8 @@ const FILES = [
   "./favicon-32.png",
   "./apple-touch-icon.png",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./pokemon-data.js"
 ];
 
 self.addEventListener("install", e => {
