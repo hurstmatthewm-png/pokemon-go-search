@@ -178,7 +178,7 @@
 
   <div id="lists"></div>
 
-  <details class="sec" id="ranges-sec">
+  <details class="sec" id="ranges-sec" open>
     <summary>Number ranges, tags &amp; move names</summary>
     <div class="builder">
       <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
@@ -879,10 +879,10 @@ document.getElementById("paste-in").addEventListener("keydown",function(e){if(e.
 
 // ---------- usage stats: sections opened, home screen launches, shared links, coffee taps ----------
 document.querySelectorAll("details.sec").forEach(function(d){
-  d.addEventListener("toggle",function(){
-    if(!d.open)return;
-    var name=(d.querySelector("summary").textContent||d.id).trim();
-    track("open-"+d.id.replace(/-sec$/,""),"Opened section: "+name);
+  var sum=d.querySelector("summary");
+  sum.addEventListener("click",function(){
+    if(d.open)return; // it's being closed
+    track("open-"+d.id.replace(/-sec$/,""),"Opened section: "+(sum.textContent||d.id).trim());
   });
 });
 (function(){
