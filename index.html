@@ -178,7 +178,7 @@
 
   <div id="lists"></div>
 
-  <details class="sec" id="ranges-sec">
+  <details class="sec" id="ranges-sec" open>
     <summary>Number ranges, tags &amp; move names</summary>
     <div class="builder">
       <div class="brow"><label>CP</label><input id="cp-min" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="min"><span>to</span><input id="cp-max" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="max"><button data-add="cp">Add</button></div>
@@ -452,7 +452,8 @@ document.getElementById("filter").oninput=e=>{
 document.getElementById("copy").addEventListener("click",function(){
   var out=document.getElementById("output"),b=this;
   if(!out.value)return;
-  try{window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:"copy-string",title:"Copied a search string",event:true});}catch(e){}
+  track("copy-string","Copied a search string");
+  countTerms(out.value);
   function fallback(){out.removeAttribute("readonly");out.focus();out.select();out.setSelectionRange(0,99999);
     var ok=false;try{ok=document.execCommand("copy");}catch(e){}
     out.setAttribute("readonly","");flash(b,ok?"Copied!":"Select & copy");}
@@ -468,7 +469,46 @@ document.addEventListener("focusout",function(){
 });
 
 // ---------- helpers shared by the features below ----------
-function track(path,title){try{window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:path,title:title,event:true});}catch(e){}}
+// Send an event to GoatCounter. If its script hasn't loaded yet (e.g. right at start-up), retry for a few seconds.
+function track(path,title,tries){
+  tries=tries||0;
+  try{
+    if(window.goatcounter&&window.goatcounter.count){window.goatcounter.count({path:path,title:title,event:true});return;}
+  }catch(e){return;}
+  if(tries<20)setTimeout(function(){track(path,title,tries+1);},500);
+}
+
+// 1. Which terms people actually use: counted when they copy (once per distinct string).
+var lastCounted="";
+function termName(t){
+  var neg=t.charAt(0)==="!";if(neg)t=t.slice(1);
+  var known=LABEL_OF.hasOwnProperty(t);
+  var n=t;
+  if(!known){
+    if(/^(cp|hp|age|distance|countcandyxl|countcandy)[\d-]+$/.test(t))n=t.replace(/[\d-]+$/,"")+" range";
+    else if(/^[0-4]-[0-4](attack|defense|hp)$/.test(t))n=t.replace(/^[0-4]-[0-4]/,"")+" bar range";
+    else if(/^[\d-]+$/.test(t))n="pokedex number";
+    else if(t.charAt(0)==="#")n="tag";
+    else if(t.charAt(0)==="@")n="move name";
+    else if(t.charAt(0)==="+")n="family search";
+    else if(window.PGS_DEX&&PGS_DEX.some(function(d){return d[0].toLowerCase()===t;}))n="pokemon: "+t;
+    else n="other custom term";
+  }
+  return (neg?"not ":"")+n;
+}
+function countTerms(str){
+  if(!str||str===lastCounted)return;lastCounted=str;
+  var seen={};
+  str.split("&").forEach(function(part){
+    var neg=part.charAt(0)==="!";
+    part.split(",").forEach(function(t){
+      if(!t)return;
+      var n=termName(neg&&t.charAt(0)!=="!"?"!"+t:t);
+      if(seen[n])return;seen[n]=1;
+      track("term-"+n.replace(/\s+/g,"-").slice(0,60),"Term used: "+n);
+    });
+  });
+}
 function store(k,v){try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function recall(k,def){try{var v=localStorage.getItem(k);return v===null?def:JSON.parse(v);}catch(e){return def;}}
 
@@ -782,7 +822,6 @@ document.getElementById("share").addEventListener("click",function(){
     list=[];items.forEach(addEntry);save();
     sec.open=true;
     setMsg("Loaded a shared trade list with "+list.length+" Pokémon. Tap Copy, then paste it into the game.");
-    track("trade-list-opened-share","Opened a shared trade list");
     setTimeout(function(){sec.scrollIntoView({behavior:"smooth",block:"start"});},300);
   }
   function readHash(){
@@ -837,6 +876,23 @@ function pasteLoad(){
 }
 document.getElementById("paste-btn").addEventListener("click",pasteLoad);
 document.getElementById("paste-in").addEventListener("keydown",function(e){if(e.key==="Enter")pasteLoad();});
+
+// ---------- usage stats: sections opened, home screen launches, shared links, coffee taps ----------
+document.querySelectorAll("details.sec").forEach(function(d){
+  var sum=d.querySelector("summary");
+  sum.addEventListener("click",function(){
+    if(d.open)return; // it's being closed
+    track("open-"+d.id.replace(/-sec$/,""),"Opened section: "+(sum.textContent||d.id).trim());
+  });
+});
+(function(){
+  var app=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
+  if(app)track("launch-home-screen","Opened from home screen");
+  if(/^#s=/.test(location.hash))track("arrived-shared-search","Arrived from a shared search link");
+  if(/^#t=/.test(location.hash))track("arrived-shared-trade-list","Arrived from a shared trade list link");
+})();
+var coffee=document.querySelector("a.coffee");
+if(coffee)coffee.addEventListener("click",function(){track("coffee-click","Tapped Buy me a coffee");});
 
 // ---------- start-up: a shared link wins, otherwise pick up where you left off ----------
 (function(){
