@@ -14,7 +14,8 @@ Build Pokémon GO search strings by tapping instead of typing. Pick what you wan
 - One-tap copy
 - Ready-made searches: transfer junk, hundos, nundos, Great/Ultra League candidates, lucky trade fodder and more
 - Save your own searches with a name (stored on your device, no account)
-- Stack searches: switch to “Add to my search” and tap a ready-made or saved search to combine it with what's already in the builder (e.g. a Battle League ranking plus the Great League IV shape)
+- Stack searches: turn on “Add to my search” at the top, and ready-made searches, saved searches, “Open in builder” and Paste add to what's already in the builder instead of replacing it (e.g. a Battle League ranking plus the Great League IV shape)
+- “Jump to” buttons for Ready-made, Saved, Battle League, Trade list and Paste
 - Picks up where you left off
 - Share a search as a link
 - Paste in any search string to edit it
