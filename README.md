@@ -18,6 +18,7 @@ Build Pokémon GO search strings by tapping instead of typing. Pick what you wan
 - Share a search as a link
 - Paste in any search string to edit it
 - Trade list builder: pick regional forms (e.g. Hisuian Voltorb but not Kanto Voltorb), with name suggestions, spell-checking and shareable lists
+- Battle League: what's on now: a ready-made search for each GO Battle League league and cup that's currently live, using PvPoke's rankings (top 15, 50, 100, 250 or all). Updates itself every few hours
 - Works offline once you've opened it
 - Works on any phone; add it to your home screen to use it like an app
 - Free, no sign-up, no cookies
@@ -31,6 +32,12 @@ In Pokémon GO, `&` means AND, `,` means OR and `!` means NOT. Commas group befo
 If it saves you time, you can [buy me a coffee](https://buymeacoffee.com/muttchew) ☕
 
 Pokémon names and regional form data from [PokéAPI](https://github.com/PokeAPI/pokeapi) (BSD-3-Clause).
+
+Battle League schedule from [LeekDuck](https://leekduck.com/events/) via [ScrapedDuck](https://github.com/bigfoott/ScrapedDuck). PvP rankings from [PvPoke](https://github.com/pvpoke/pvpoke) (MIT licence).
+
+## How the Battle League section stays up to date
+
+A GitHub Actions workflow (`.github/workflows/pvp-data.yml`) runs every 6 hours. It runs `scripts/update-pvp-data.mjs`, which reads the league calendar and PvPoke's rankings and saves them to `data/pvp.json`, then publishes the site. If a source is down or sends something odd, the last good data is kept, the site still publishes, and the run is marked as failed so GitHub sends an email. The site warns visitors if the data is more than 2 days old.
 
 ---
 
