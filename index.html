@@ -75,6 +75,12 @@
   .tl-forms{display:flex;gap:4px;flex-wrap:wrap}
   .fchip{padding:5px 10px;font-size:13px;border-radius:999px}
   .fchip.on{background:var(--any);border-color:var(--any);color:#fff}
+  .stack-toggle.on{background:var(--any);border-color:var(--any);color:#fff}
+  .jump{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+  .jump span{font-size:13px;color:var(--muted);margin-right:2px}
+  #added.collapsed .addwrap:nth-child(n+21){display:none}
+  .more-added{margin-top:8px;padding:5px 12px;font-size:13px;border-radius:999px}
+  footer a:not(.coffee){color:var(--any)}
   .tl-warn{font-size:13px;color:var(--ex);margin:0 2px 8px}
   .tl-warn:empty{display:none}
   .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
@@ -91,7 +97,6 @@
   .pvp-head small{color:var(--muted);font-size:12px}
   .pvp-rules{font-size:13px;margin-bottom:4px}
   .pvp-meta{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4}
-  .stack-mode{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
   .pvp-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0}
   .pvp-range label{font-weight:600;font-size:14px}
   .pvp-range input{width:76px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
@@ -166,18 +171,22 @@
   <div class="row">
     <button id="clear">Clear all</button>
     <button id="share">Share link</button>
-    <span class="hint" id="count">0 terms selected</span>
+    <button id="stack" type="button" class="stack-toggle" aria-pressed="false" title="When on, ready-made searches, saved searches, Open in builder and Paste add to your search instead of replacing it">＋ Add to my search</button>
   </div>
 </header>
 
 <main>
   <p class="hint how">Pick a mode at the top, then tap terms below. Tap a term again to remove it. Search words are in English; symbols and numbers (like <code>4*</code> or <code>!</code>) work in any game language.</p>
+  <nav class="jump" aria-label="Jump to a section">
+    <span>Jump to:</span>
+    <button type="button" class="fchip" data-jump="presets-sec">Ready-made</button>
+    <button type="button" class="fchip" data-jump="saved-sec">Saved</button>
+    <button type="button" class="fchip" data-jump="pvp-sec">Battle League</button>
+    <button type="button" class="fchip" data-jump="trade-sec">Trade list</button>
+    <button type="button" class="fchip" data-jump="paste-sec">Paste</button>
+  </nav>
   <details class="sec" id="presets-sec">
     <summary>Ready-made searches</summary>
-    <div class="stack-mode" role="group" aria-label="When you tap a ready-made or saved search">
-      <button type="button" class="fchip on" data-stack="replace" aria-pressed="true">Replace my search</button>
-      <button type="button" class="fchip" data-stack="add" aria-pressed="false">Add to my search</button>
-    </div>
     <div class="presets">
       <button class="preset" data-str="0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs" data-name="Transfer junk"><b>Transfer junk</b><small>Low-star Pokémon with nothing special about them. Always look over the results before transferring.</small><code>0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs</code></button>
       <button class="preset" data-str="4*" data-name="Perfect IVs (hundos)"><b>Perfect IVs (hundos)</b><small>Every 4-star Pokémon</small><code>4*</code></button>
@@ -194,14 +203,15 @@
       <button class="preset" data-str="countcandyxl296-" data-name="Enough XL candy for level 50"><b>Enough XL candy for level 50</b><small>296+ XL candy: enough to take a Pokémon from level 40 to 50</small><code>countcandyxl296-</code></button>
     </div>
     <button id="more-presets" type="button">Show all 12</button>
-    <div class="hint">Tap one to load it, then add or remove terms below to make it your own. Choose “Add to my search” to combine it with what's already in the builder, e.g. a Battle League ranking plus Great League candidates. Always check the results in the game before transferring anything.</div>
+    <div class="hint">Tap one to load it, then add or remove terms below to make it your own. Turn on “Add to my search” at the top to combine it with what's already in the builder, e.g. a Battle League ranking plus Great League candidates. Always check the results in the game before transferring anything.</div>
   </details>
 
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
 
   <section id="added-sec" class="hidden">
-    <div class="sec-head"><h2>Your added terms</h2><button id="clear-added" type="button" class="clear-added">Clear all</button></div>
-    <div class="chips" id="added"></div>
+    <div class="sec-head"><h2 id="added-title">Your added terms</h2><button id="clear-added" type="button" class="clear-added">Clear all</button></div>
+    <div class="chips collapsed" id="added"></div>
+    <button type="button" id="added-more" class="more-added hidden"></button>
   </section>
 
   <div id="lists"></div>
@@ -224,10 +234,6 @@
 
   <section id="saved-sec">
     <h2>Your saved searches</h2>
-    <div class="stack-mode" role="group" aria-label="When you tap a ready-made or saved search">
-      <button type="button" class="fchip on" data-stack="replace" aria-pressed="true">Replace my search</button>
-      <button type="button" class="fchip" data-stack="add" aria-pressed="false">Add to my search</button>
-    </div>
     <div class="saved-list" id="saved"></div>
     <div class="brow"><input id="save-name" class="wide" maxlength="40" placeholder="Name it, e.g. PvP keepers"><button id="save-btn">Save current</button></div>
     <div class="hint">Saved on this phone or computer only. No account needed.</div>
@@ -246,7 +252,7 @@
     <div class="tl-warn" id="tl-warn"></div>
     <div class="tl-out" id="tl-out"></div>
     <div class="brow"><button id="tl-copy" type="button">Copy</button><button id="tl-share" type="button">Share list</button><button id="tl-use" type="button">Open in builder</button><button id="tl-clear" type="button">Clear list</button></div>
-    <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Pokémon names are used so the game's “show evolutions” option still works; a few (like Mew, which would also find Mewtwo, or names with spaces such as Mr. Mime) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
+    <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Pokémon names are used so the game's “Show Evolutionary Line” option still works; a few (like Mew, which would also find Mewtwo, or names with spaces such as Mr. Mime) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
   <details class="sec" id="pvp-sec">
@@ -255,8 +261,8 @@
     <div class="pvp-status" id="pvp-status" aria-live="polite"></div>
     <div class="pvp-list" id="pvp-list"></div>
     <div class="hint" id="pvp-next"></div>
-    <div class="hint">Tip: to add an IV filter such as Great League candidates, tap “Open in builder”, then in Ready-made searches choose “Add to my search” and tap the one you want.</div>
-    <div class="hint">Rankings are PvPoke's simulations, not what's winning in the game right now. To include Pokémon that evolve into these, turn on the game's “Show evolutionary line” option after pasting. Times are in your time zone.</div>
+    <div class="hint">Tip: to add an IV filter such as Great League candidates, turn on “Add to my search” at the top, then tap “Open in builder” here and the ready-made search you want (either order works).</div>
+    <div class="hint">Rankings are PvPoke's simulations, not what's winning in the game right now. To include Pokémon that evolve into these, turn on the game's “Show Evolutionary Line” option after pasting. Times are in your time zone.</div>
   </details>
 
   <details class="sec" id="paste-sec">
@@ -418,9 +424,8 @@ function render(){
   const {str,n}=build();
   document.getElementById("output").value=str;
   const ex=document.getElementById("explain");
-  if(str){ex.innerHTML="";const b=document.createElement("b");b.textContent="Finds: ";ex.appendChild(b);ex.appendChild(document.createTextNode(explain(str)));}
+  if(str){ex.innerHTML="";const b=document.createElement("b");b.textContent=n+" term"+(n==1?"":"s")+" · Finds: ";ex.appendChild(b);ex.appendChild(document.createTextNode(explain(str)));}
   else ex.textContent="";
-  document.getElementById("count").textContent=n+" term"+(n==1?"":"s")+" selected";
 }
 
 // mode buttons
@@ -471,12 +476,25 @@ function addCustom(term){
   wrap.appendChild(c);wrap.appendChild(del);
   document.getElementById("added").appendChild(wrap);
   document.getElementById("added-sec").classList.remove("hidden");
+  addedCount();
 }
+// Long lists (e.g. a Battle League top 100) show the first 20 with "Show all"
+var ADDED_SHOWN=20;
+function addedCount(){
+  var n=added.length,box=document.getElementById("added"),more=document.getElementById("added-more");
+  document.getElementById("added-title").textContent="Your added terms"+(n>ADDED_SHOWN?" ("+n+")":"");
+  more.classList.toggle("hidden",n<=ADDED_SHOWN);
+  more.textContent=box.classList.contains("collapsed")?"Show all "+n:"Show fewer";
+}
+document.getElementById("added-more").addEventListener("click",function(){
+  document.getElementById("added").classList.toggle("collapsed");addedCount();
+});
 function removeAdded(term,el){
   var i=added.indexOf(term);if(i>-1)added.splice(i,1);
   el.parentNode.removeChild(el);
   if(state.has(term)){state.delete(term);order.splice(order.indexOf(term),1);}
   if(!added.length)document.getElementById("added-sec").classList.add("hidden");
+  addedCount();
   render();
 }
 // "Clear all" for added terms: first tap asks, second tap (within 3s) clears
@@ -495,6 +513,7 @@ function removeAdded(term,el){
     added.length=0;
     document.getElementById("added").innerHTML="";
     document.getElementById("added-sec").classList.add("hidden");
+    addedCount();
     track("clear-added","Cleared added terms");
     render();
   });
@@ -607,32 +626,27 @@ function put(term,m){
   state.set(term,m);
 }
 
-// ---------- stacking: "Replace my search" or "Add to my search" for ready-made and saved searches ----------
-// Adding joins the two with & (AND); terms in both are only kept once. Goes back to "Replace" on each visit.
+// ---------- stacking: the "Add to my search" toggle in the header ----------
+// When on, every way of loading a search (ready-made, saved, Battle League and trade list
+// "Open in builder", Paste) adds to the current search instead of replacing it.
+// Adding joins the two with & (AND); terms in both are only kept once. Off again on each visit.
 var stackMode=false;
-function useSearch(str){
+function useSearch(str,where){
   var cur=build().str,stacked=stackMode&&!!cur;
   loadString(stacked?cur+"&"+str:str);
+  if(stacked&&where)track("stack-"+where,"Added to the current search from: "+where);
   return stacked;
 }
-document.querySelectorAll(".stack-mode").forEach(function(g){
-  g.addEventListener("click",function(e){
-    var b=e.target.closest("button[data-stack]");if(!b)return;
-    stackMode=b.getAttribute("data-stack")==="add";
-    // both switches (ready-made and saved searches) stay in step
-    document.querySelectorAll(".stack-mode button").forEach(function(x){
-      var on=(x.getAttribute("data-stack")==="add")===stackMode;
-      x.classList.toggle("on",on);x.setAttribute("aria-pressed",on?"true":"false");
-    });
-  });
+document.getElementById("stack").addEventListener("click",function(){
+  stackMode=!stackMode;
+  this.classList.toggle("on",stackMode);this.setAttribute("aria-pressed",stackMode?"true":"false");
 });
 
 // ---------- 1. ready-made searches ----------
 document.querySelectorAll(".preset").forEach(function(b){
   b.addEventListener("click",function(){
-    var stacked=useSearch(b.getAttribute("data-str"));
+    useSearch(b.getAttribute("data-str"),"preset");
     track("preset-"+b.getAttribute("data-name").toLowerCase().replace(/[^a-z0-9]+/g,"-"),"Used preset: "+b.getAttribute("data-name"));
-    if(stacked)track("stack-preset","Added a ready-made search to the current one");
     window.scrollTo({top:0,behavior:"smooth"});
   });
 });
@@ -657,7 +671,7 @@ function renderFavs(){
     var st=document.createElement("small");st.textContent=f.str;
     load.appendChild(nm);load.appendChild(st);
     load.addEventListener("click",function(){
-      if(useSearch(f.str))track("stack-saved","Added a saved search to the current one");
+      useSearch(f.str,"saved");track("saved-load","Loaded a saved search");
       window.scrollTo({top:0,behavior:"smooth"});
     });
     var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
@@ -722,7 +736,7 @@ document.getElementById("share").addEventListener("click",function(){
   });
   // What to put in the search for one entry: the name, unless it would also match a Pokémon
   // from a different evolution family (e.g. "mew" finds Mewtwo) or has spaces/punctuation;
-  // then the Pokédex number. Names keep the game's "show evolutions" option working.
+  // then the Pokédex number. Names keep the game's "Show Evolutionary Line" option working.
   function termsOf(e){
     var d=find(e.name);if(!d)return [e.name];
     return (d.safe&&!d.clashOther)?[d.key]:[String(d.num)];
@@ -946,7 +960,7 @@ document.getElementById("share").addEventListener("click",function(){
   });
   document.getElementById("tl-use").addEventListener("click",function(){
     var str=tradeString();if(!str){flash(this,"Add a Pokémon first");return;}
-    loadString(str);track("trade-list-open","Opened a trade list in the builder");
+    useSearch(str,"trade");track("trade-list-open","Opened a trade list in the builder");
     window.scrollTo({top:0,behavior:"smooth"});
   });
   window.addEventListener("hashchange",readHash);
@@ -969,7 +983,7 @@ document.getElementById("share").addEventListener("click",function(){
 
   // What to search for each Pokédex number: the name, unless it would also find a Pokémon from another
   // evolution family (the game matches the start of a name, e.g. "mew" finds Mewtwo) or has spaces or
-  // punctuation; then the number. Names keep the game's "Show evolutionary line" option working.
+  // punctuation; then the number. Names keep the game's "Show Evolutionary Line" option working.
   var DEXL=(Array.isArray(window.PGS_DEX)?window.PGS_DEX:[]).map(function(d){return {key:String(d[0]).toLowerCase().replace(/\s+/g," ").trim(),chain:d[2]};});
   var TERM={};
   function term(n){
@@ -1150,7 +1164,7 @@ document.getElementById("share").addEventListener("click",function(){
       if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(function(){flash(b,"Copied!");},function(){prompt("Copy this:",str);});
       else prompt("Copy this:",str);
     }else{
-      loadString(str);track("pvp-open-builder","Opened a Battle League search in the builder");
+      useSearch(str,"pvp");track("pvp-open-builder","Opened a Battle League search in the builder");
       window.scrollTo({top:0,behavior:"smooth"});
     }
   });
@@ -1166,11 +1180,22 @@ document.getElementById("share").addEventListener("click",function(){
 function pasteLoad(){
   var inp=document.getElementById("paste-in"),b=document.getElementById("paste-btn"),v=inp.value.trim();
   if(!v){inp.focus();flash(b,"Paste first");return;}
-  loadString(v);inp.value="";flash(b,"Loaded!");track("paste-load","Loaded a pasted string");
+  useSearch(v,"paste");inp.value="";flash(b,"Loaded!");track("paste-load","Loaded a pasted string");
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.getElementById("paste-btn").addEventListener("click",pasteLoad);
 document.getElementById("paste-in").addEventListener("keydown",function(e){if(e.key==="Enter")pasteLoad();});
+
+// ---------- jump to a section ----------
+document.querySelectorAll("[data-jump]").forEach(function(b){
+  b.addEventListener("click",function(){
+    var el=document.getElementById(b.getAttribute("data-jump"));if(!el)return;
+    if(el.tagName==="DETAILS"&&!el.open)el.open=true;
+    var h=document.querySelector("header").offsetHeight;
+    window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-h-8,behavior:"smooth"});
+    track("jump-"+el.id.replace(/-sec$/,""),"Jumped to: "+b.textContent);
+  });
+});
 
 // ---------- usage stats: sections opened, home screen launches, shared links, coffee taps ----------
 document.querySelectorAll("details.sec").forEach(function(d){
