@@ -119,6 +119,9 @@
   .brow input.wide{width:auto;flex:1 1 120px}
   .addwrap{display:inline-flex;align-items:center;gap:2px}
   .del{padding:4px 8px;border-radius:999px;font-size:12px;color:var(--ex)}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .sec-head h2{margin:0}
+  .clear-added{padding:4px 12px;border-radius:999px;font-size:13px;color:var(--ex)}
   .legend span{display:inline-block;margin-right:10px}
   input,textarea,select{font-size:16px!important}
   .coffee{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px auto 16px;max-width:320px;padding:12px 18px;border-radius:12px;background:#ffdd00;color:#1d1d1d;font-weight:700;text-decoration:none;font-size:16px}
@@ -192,7 +195,7 @@
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
 
   <section id="added-sec" class="hidden">
-    <h2>Your added terms</h2>
+    <div class="sec-head"><h2>Your added terms</h2><button id="clear-added" type="button" class="clear-added">Clear all</button></div>
     <div class="chips" id="added"></div>
   </section>
 
@@ -466,6 +469,26 @@ function removeAdded(term,el){
   if(!added.length)document.getElementById("added-sec").classList.add("hidden");
   render();
 }
+// "Clear all" for added terms: first tap asks, second tap (within 3s) clears
+(function(){
+  var b=document.getElementById("clear-added"),armed=null;
+  b.addEventListener("click",function(){
+    if(!armed){
+      b.textContent="Tap again to clear";
+      armed=setTimeout(function(){armed=null;b.textContent="Clear all";},3000);
+      return;
+    }
+    clearTimeout(armed);armed=null;b.textContent="Clear all";
+    added.slice().forEach(function(t){
+      if(state.has(t)){state.delete(t);order.splice(order.indexOf(t),1);}
+    });
+    added.length=0;
+    document.getElementById("added").innerHTML="";
+    document.getElementById("added-sec").classList.add("hidden");
+    track("clear-added","Cleared added terms");
+    render();
+  });
+})();
 function flash(b,msg){var o=b.textContent;b.textContent=msg;setTimeout(function(){b.textContent=o;},1200);}
 
 // filter
