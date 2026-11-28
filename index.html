@@ -91,6 +91,7 @@
   .pvp-head small{color:var(--muted);font-size:12px}
   .pvp-rules{font-size:13px;margin-bottom:4px}
   .pvp-meta{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+  .stack-mode{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
   .pvp-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0}
   .pvp-range label{font-weight:600;font-size:14px}
   .pvp-range input{width:76px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
@@ -173,6 +174,10 @@
   <p class="hint how">Pick a mode at the top, then tap terms below. Tap a term again to remove it. Search words are in English; symbols and numbers (like <code>4*</code> or <code>!</code>) work in any game language.</p>
   <details class="sec" id="presets-sec">
     <summary>Ready-made searches</summary>
+    <div class="stack-mode" role="group" aria-label="When you tap a ready-made or saved search">
+      <button type="button" class="fchip on" data-stack="replace" aria-pressed="true">Replace my search</button>
+      <button type="button" class="fchip" data-stack="add" aria-pressed="false">Add to my search</button>
+    </div>
     <div class="presets">
       <button class="preset" data-str="0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs" data-name="Transfer junk"><b>Transfer junk</b><small>Low-star Pokémon with nothing special about them. Always look over the results before transferring.</small><code>0*,1*&amp;!shiny&amp;!lucky&amp;!shadow&amp;!purified&amp;!legendary&amp;!mythical&amp;!costume&amp;!background&amp;!dynamax&amp;!gigantamax&amp;!favorite&amp;!#&amp;!evolvenew&amp;!xxl&amp;!xxs</code></button>
       <button class="preset" data-str="4*" data-name="Perfect IVs (hundos)"><b>Perfect IVs (hundos)</b><small>Every 4-star Pokémon</small><code>4*</code></button>
@@ -189,7 +194,7 @@
       <button class="preset" data-str="countcandyxl296-" data-name="Enough XL candy for level 50"><b>Enough XL candy for level 50</b><small>296+ XL candy: enough to take a Pokémon from level 40 to 50</small><code>countcandyxl296-</code></button>
     </div>
     <button id="more-presets" type="button">Show all 12</button>
-    <div class="hint">Tap one to load it, then add or remove terms below to make it your own. Always check the results in the game before transferring anything.</div>
+    <div class="hint">Tap one to load it, then add or remove terms below to make it your own. Choose “Add to my search” to combine it with what's already in the builder, e.g. a Battle League ranking plus Great League candidates. Always check the results in the game before transferring anything.</div>
   </details>
 
   <input id="filter" type="search" placeholder="Filter the list (e.g. shiny, buddy, fire)…">
@@ -219,6 +224,10 @@
 
   <section id="saved-sec">
     <h2>Your saved searches</h2>
+    <div class="stack-mode" role="group" aria-label="When you tap a ready-made or saved search">
+      <button type="button" class="fchip on" data-stack="replace" aria-pressed="true">Replace my search</button>
+      <button type="button" class="fchip" data-stack="add" aria-pressed="false">Add to my search</button>
+    </div>
     <div class="saved-list" id="saved"></div>
     <div class="brow"><input id="save-name" class="wide" maxlength="40" placeholder="Name it, e.g. PvP keepers"><button id="save-btn">Save current</button></div>
     <div class="hint">Saved on this phone or computer only. No account needed.</div>
@@ -246,6 +255,7 @@
     <div class="pvp-status" id="pvp-status" aria-live="polite"></div>
     <div class="pvp-list" id="pvp-list"></div>
     <div class="hint" id="pvp-next"></div>
+    <div class="hint">Tip: to add an IV filter such as Great League candidates, tap “Open in builder”, then in Ready-made searches choose “Add to my search” and tap the one you want.</div>
     <div class="hint">Rankings are PvPoke's simulations, not what's winning in the game right now. To include Pokémon that evolve into these, turn on the game's “Show evolutionary line” option after pasting. Times are in your time zone.</div>
   </details>
 
@@ -570,7 +580,7 @@ function recall(k,def){try{var v=localStorage.getItem(k);return v===null?def:JSO
 // Only one "any of" group fits the builder, so any further comma groups
 // (or negated comma groups) are kept as-is as custom terms, which keeps the meaning.
 function loadString(str){
-  str=String(str||"").slice(0,10000).toLowerCase().replace(/\s*([&,!])\s*/g,"$1").trim();
+  str=String(str||"").slice(0,20000).toLowerCase().replace(/\s*([&,!])\s*/g,"$1").trim();
   state.clear();order.length=0;
   var anyUsed=false;
   str.split("&").forEach(function(part){
@@ -597,11 +607,32 @@ function put(term,m){
   state.set(term,m);
 }
 
+// ---------- stacking: "Replace my search" or "Add to my search" for ready-made and saved searches ----------
+// Adding joins the two with & (AND); terms in both are only kept once. Goes back to "Replace" on each visit.
+var stackMode=false;
+function useSearch(str){
+  var cur=build().str,stacked=stackMode&&!!cur;
+  loadString(stacked?cur+"&"+str:str);
+  return stacked;
+}
+document.querySelectorAll(".stack-mode").forEach(function(g){
+  g.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-stack]");if(!b)return;
+    stackMode=b.getAttribute("data-stack")==="add";
+    // both switches (ready-made and saved searches) stay in step
+    document.querySelectorAll(".stack-mode button").forEach(function(x){
+      var on=(x.getAttribute("data-stack")==="add")===stackMode;
+      x.classList.toggle("on",on);x.setAttribute("aria-pressed",on?"true":"false");
+    });
+  });
+});
+
 // ---------- 1. ready-made searches ----------
 document.querySelectorAll(".preset").forEach(function(b){
   b.addEventListener("click",function(){
-    loadString(b.getAttribute("data-str"));
+    var stacked=useSearch(b.getAttribute("data-str"));
     track("preset-"+b.getAttribute("data-name").toLowerCase().replace(/[^a-z0-9]+/g,"-"),"Used preset: "+b.getAttribute("data-name"));
+    if(stacked)track("stack-preset","Added a ready-made search to the current one");
     window.scrollTo({top:0,behavior:"smooth"});
   });
 });
@@ -625,7 +656,10 @@ function renderFavs(){
     var nm=document.createElement("b");nm.textContent=f.name;
     var st=document.createElement("small");st.textContent=f.str;
     load.appendChild(nm);load.appendChild(st);
-    load.addEventListener("click",function(){loadString(f.str);window.scrollTo({top:0,behavior:"smooth"});});
+    load.addEventListener("click",function(){
+      if(useSearch(f.str))track("stack-saved","Added a saved search to the current one");
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
     var del=document.createElement("button");del.className="del";del.type="button";del.textContent="✕";
     del.setAttribute("aria-label","Delete saved search "+f.name);
     del.addEventListener("click",function(){
