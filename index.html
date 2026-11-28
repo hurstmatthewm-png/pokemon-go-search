@@ -78,8 +78,6 @@
   .tl-warn{font-size:13px;color:var(--ex);margin:0 2px 8px}
   .tl-warn:empty{display:none}
   .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
-  .pvp-depth{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-  .pvp-depth span{font-weight:600;font-size:14px;margin-right:4px}
   .pvp-status{font-size:13px;color:var(--muted);margin:0 2px 8px;line-height:1.4}
   .pvp-status:empty{display:none}
   .pvp-status.warn{color:var(--ex)}
@@ -93,6 +91,12 @@
   .pvp-head small{color:var(--muted);font-size:12px}
   .pvp-rules{font-size:13px;margin-bottom:4px}
   .pvp-meta{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+  .pvp-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  .pvp-range label{font-weight:600;font-size:14px}
+  .pvp-range input{width:76px;padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+  .pvp-range input::placeholder{color:var(--muted);opacity:.75}
+  .pvp-note{font-size:12px;color:var(--ex);margin:-2px 0 6px}
+  .pvp-note:empty{display:none}
   .pvp-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:6px;line-height:1.45;max-height:calc(5.8em + 18px);overflow:auto}
   main{padding:12px 14px 60px;max-width:900px;margin:0 auto}
   #filter{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:10px}
@@ -235,15 +239,7 @@
 
   <details class="sec" id="pvp-sec">
     <summary>Battle League: what's on now</summary>
-    <p class="hint" style="margin-top:0">A search for each GO Battle League league and cup that's on right now, built from PvPoke's rankings. Choose how many of the top-ranked Pokémon to include, then copy.</p>
-    <div class="pvp-depth" id="pvp-depth" role="group" aria-label="How many top-ranked Pokémon to include">
-      <span>Top</span>
-      <button type="button" class="fchip" data-n="15">15</button>
-      <button type="button" class="fchip" data-n="50">50</button>
-      <button type="button" class="fchip" data-n="100">100</button>
-      <button type="button" class="fchip" data-n="250">250</button>
-      <button type="button" class="fchip" data-n="0">All</button>
-    </div>
+    <p class="hint" style="margin-top:0">A search for each GO Battle League league and cup that's on right now, built from PvPoke's rankings. Leave the rank boxes empty to include every ranked Pokémon, or type a range (e.g. 1 to 100), then copy.</p>
     <div class="pvp-status" id="pvp-status" aria-live="polite"></div>
     <div class="pvp-list" id="pvp-list"></div>
     <div class="hint" id="pvp-next"></div>
@@ -906,11 +902,12 @@ document.getElementById("share").addEventListener("click",function(){
 // LeekDuck's league calendar (via ScrapedDuck) and PvPoke's rankings.
 (function(){
   var sec=document.getElementById("pvp-sec");if(!sec)return;
-  var KEY="pgs-pvp-top",DEPTHS=[15,50,100,250,0],STALE_MS=2*864e5,RELOAD_MS=10*6e4;
+  var STALE_MS=2*864e5,RELOAD_MS=10*6e4;
   var statusEl=document.getElementById("pvp-status"),listEl=document.getElementById("pvp-list"),nextEl=document.getElementById("pvp-next");
-  var depthEl=document.getElementById("pvp-depth");
-  var depth=recall(KEY,100);if(DEPTHS.indexOf(depth)<0)depth=100;
   var data=null,loadedAt=0,loading=false,shown=[],sent={};
+  // The rank range typed for each league, e.g. {"Master League":{from:"1",to:"50"}}. Starts blank (= all) each visit.
+  var ranges={};
+  store("pgs-pvp-top",null); // tidy away the old Top 15/50/100 setting
   var LEAGUE={500:"Little Cup",1500:"Great League",2500:"Ultra League",10000:"Master League"};
 
   // What to search for each Pokédex number: the name, unless it would also find a Pokémon from another
@@ -947,9 +944,21 @@ document.getElementById("share").addEventListener("click",function(){
   function catchDays(lg){var t=catchStart(lg);if(t===null)return null;var d=Math.floor((Date.now()-t)/864e5);return d<0?null:d;}
 
   function ranking(lg){var r=lg.rank&&data.rankings&&data.rankings[lg.rank];return r&&Array.isArray(r.dex)&&r.dex.length?r:null;}
+  // The ranks to use for a league: blank "from" = 1, blank "to" = the last ranked Pokémon.
+  // Typed the wrong way round? Use them the right way round. Past the end of the list? Stop at the end.
+  function span(lg){
+    var r=ranking(lg);if(!r)return null;
+    var n=r.dex.length,st=ranges[lg.name]||{},a=parseInt(st.from,10),b=parseInt(st.to,10);
+    var lo=a>0?a:1,hi=b>0?b:n,capped=false;
+    if(lo>hi){var t=lo;lo=hi;hi=t;}
+    if(hi>n){hi=n;capped=true;}
+    if(lo>n){lo=n;capped=true;}
+    return {lo:lo,hi:hi,n:n,all:lo===1&&hi===n,capped:capped};
+  }
+  function capNote(s){return s&&s.capped?"Only "+s.n+" are ranked for this one, so the range stops at "+s.n+".":"";}
   function build(lg){
-    var r=ranking(lg),parts=[];
-    if(r)parts.push((depth?r.dex.slice(0,depth):r.dex).map(term).join(","));
+    var r=ranking(lg),s=span(lg),parts=[];
+    if(r)parts.push(r.dex.slice(s.lo-1,s.hi).map(term).join(","));
     if(lg.cp&&lg.cp<10000)parts.push("cp-"+lg.cp);
     if(lg.kind==="catch"){var a=catchDays(lg);if(a!==null)parts.push("age0-"+a);parts.push("!mythical");}
     return parts.join("&");
@@ -963,8 +972,9 @@ document.getElementById("share").addEventListener("click",function(){
   function meta(lg){
     var r=ranking(lg),out=[];
     if(!r)return "PvPoke hasn't ranked this one yet, so this search only checks the CP limit. Check the other rules in the game.";
-    var n=r.dex.length,k=depth&&depth<n?depth:n;
-    out.push((k<n?"Top "+k+" of "+n:"All "+n)+" ranked Pokémon"+(r.top&&r.top.length?". PvPoke's top picks: "+r.top.join(", "):"")+".");
+    var s=span(lg),n=s.n;
+    var which=s.all?"All "+n+" ranked Pokémon":(s.lo===s.hi?"Rank "+s.lo:"Ranks "+s.lo+"–"+s.hi)+" of "+n+" ranked Pokémon";
+    out.push(which+(r.top&&r.top.length?". PvPoke's top picks: "+r.top.join(", "):"")+".");
     if(lg.kind==="catch"){var t=catchStart(lg);out.push("Ranked with PvPoke's "+(LEAGUE[lg.cp]||"league")+" list"+(lg.megas?" (Megas allowed)":"")+", then limited to Pokémon caught "+(t!==null?"since "+day(t):"this season")+".");}
     return out.join(" ");
   }
@@ -984,10 +994,21 @@ document.getElementById("share").addEventListener("click",function(){
     return n;
   }
 
-  function drawDepth(){
-    depthEl.querySelectorAll("button").forEach(function(b){
-      var on=Number(b.getAttribute("data-n"))===depth;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false");
-    });
+  // Refresh one card's text and search after its range changes (without redrawing the boxes being typed in)
+  function updateCard(card,x){
+    var lg=x.lg,str=build(lg),note=card.querySelector(".pvp-note");
+    card.querySelector(".pvp-meta").textContent=meta(lg);
+    if(note)note.textContent=capNote(span(lg));
+    card.querySelector(".pvp-out").textContent=str||"(nothing to filter: every Pokémon can enter)";
+  }
+  function rangeBoxes(lg,i){
+    var r=ranking(lg);if(!r)return "";
+    var st=ranges[lg.name]||{from:"",to:""},n=r.dex.length;
+    function box(which,hint,label){
+      return '<input id="pvp-'+which+'-'+i+'" data-r="'+which+'" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="'+hint+'" value="'+esc(st[which]||"")+'" aria-label="'+label+'">';
+    }
+    return '<div class="pvp-range"><label for="pvp-from-'+i+'">Ranks</label>'+box("from","1","From rank")+'<span>to</span>'+box("to",n,"To rank (up to "+n+")")+'</div>'+
+      '<div class="pvp-note">'+esc(capNote(span(lg)))+'</div>';
   }
   function render(){
     if(!data)return;
@@ -1009,6 +1030,7 @@ document.getElementById("share").addEventListener("click",function(){
       return '<div class="pvp-card" data-i="'+i+'">'+
         '<div class="pvp-head"><b>'+esc(lg.name)+'</b><small>Until '+esc(when(x.end))+'</small></div>'+
         '<div class="pvp-rules">'+esc(rules(lg))+'</div>'+
+        rangeBoxes(lg,i)+
         '<div class="pvp-meta">'+esc(meta(lg))+'</div>'+
         '<div class="pvp-out">'+(str?esc(str):"(nothing to filter: every Pokémon can enter)")+'</div>'+
         (str?'<div class="brow"><button type="button" data-act="copy">Copy</button><button type="button" data-act="open">Open in builder</button></div>':'')+
@@ -1036,9 +1058,23 @@ document.getElementById("share").addEventListener("click",function(){
       });
   }
 
-  depthEl.addEventListener("click",function(e){
-    var b=e.target.closest("button[data-n]");if(!b)return;
-    depth=Number(b.getAttribute("data-n"));store(KEY,depth);drawDepth();render();
+  function cardOf(el){var card=el&&el.closest(".pvp-card"),x=card&&shown[Number(card.getAttribute("data-i"))];return x?{card:card,x:x}:null;}
+  // Typing in a rank box: numbers only, and the card updates as you type
+  listEl.addEventListener("input",function(e){
+    var inp=e.target.closest("input[data-r]"),c=cardOf(inp);if(!c)return;
+    var clean=inp.value.replace(/\D/g,"").slice(0,4);if(clean!==inp.value)inp.value=clean;
+    var st=ranges[c.x.lg.name]||(ranges[c.x.lg.name]={from:"",to:""});
+    st[inp.getAttribute("data-r")]=clean;
+    updateCard(c.card,c.x);
+  });
+  // Leaving a rank box: tidy it (0 means blank; past the end of the list becomes the last rank)
+  listEl.addEventListener("change",function(e){
+    var inp=e.target.closest("input[data-r]"),c=cardOf(inp),r=c&&ranking(c.x.lg);if(!r)return;
+    var v=parseInt(inp.value,10),fixed=v>0?String(Math.min(v,r.dex.length)):"";
+    if(fixed===inp.value)return;
+    inp.value=fixed;
+    (ranges[c.x.lg.name]||(ranges[c.x.lg.name]={from:"",to:""}))[inp.getAttribute("data-r")]=fixed;
+    updateCard(c.card,c.x);
   });
   statusEl.addEventListener("click",function(e){if(e.target.closest('[data-act="retry"]'))load();});
   listEl.addEventListener("click",function(e){
@@ -1047,7 +1083,13 @@ document.getElementById("share").addEventListener("click",function(){
     var lg=x.lg,str=build(lg);if(!str)return;
     if(b.getAttribute("data-act")==="copy"){
       track("pvp-copy-"+slug(lg.name),"Copied Battle League search: "+lg.name);
-      if(ranking(lg))track("pvp-top-"+(depth||"all"),"Battle League search size: "+(depth?"top "+depth:"all ranked"));
+      // Range used, in broad groups rather than exact numbers (like the CP and HP ranges)
+      var s=span(lg);
+      if(s){
+        var size=s.hi-s.lo+1,g=s.all?["all","all ranked"]:size<=15?["1-15","1–15"]:size<=50?["16-50","16–50"]:size<=100?["51-100","51–100"]:size<=250?["101-250","101–250"]:["251-plus","251+"];
+        track("pvp-range-size-"+g[0],"Battle League range size: "+g[1]);
+        if(s.lo>1)track("pvp-range-skips-top","Battle League range skips the top ranks");
+      }
       if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(function(){flash(b,"Copied!");},function(){prompt("Copy this:",str);});
       else prompt("Copy this:",str);
     }else{
@@ -1060,7 +1102,6 @@ document.getElementById("share").addEventListener("click",function(){
     if(!sec.open)return;
     if(!data||Date.now()-loadedAt>RELOAD_MS)load();else render();
   });
-  drawDepth();
   if(sec.open)load();
 })();
 

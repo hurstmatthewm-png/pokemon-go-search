@@ -18,7 +18,7 @@ Build Pokémon GO search strings by tapping instead of typing. Pick what you wan
 - Share a search as a link
 - Paste in any search string to edit it
 - Trade list builder: pick regional forms (e.g. Hisuian Voltorb but not Kanto Voltorb), with name suggestions, spell-checking and shareable lists
-- Battle League: what's on now: a ready-made search for each GO Battle League league and cup that's currently live, using PvPoke's rankings (top 15, 50, 100, 250 or all). Updates itself every few hours
+- Battle League: what's on now: a ready-made search for each GO Battle League league and cup that's currently live, using PvPoke's rankings. Type any rank range for each one (e.g. 1 to 100), or leave it blank for every ranked Pokémon; each box shows how far that cup's rankings go. Updates itself every few hours
 - Works offline once you've opened it
 - Works on any phone; add it to your home screen to use it like an app
 - Free, no sign-up, no cookies
