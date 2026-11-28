@@ -1,7 +1,7 @@
 // Lets the site open with no signal once it has been visited.
 // The page itself is fetched fresh when online (so updates show up straight away)
 // and falls back to the saved copy when offline.
-const CACHE = "pgs-v2";
+const CACHE = "pgs-v3";
 const FILES = [
   "./",
   "./index.html",
@@ -27,7 +27,8 @@ self.addEventListener("activate", e => {
 
 self.addEventListener("fetch", e => {
   const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== location.origin) return;
 
   if (req.mode === "navigate") {
     e.respondWith(
@@ -38,6 +39,22 @@ self.addEventListener("fetch", e => {
           return res;
         })
         .catch(() => caches.match("./"))
+    );
+    return;
+  }
+
+  // Battle League data changes every few hours: always try for the latest, use the saved copy when offline.
+  if (url.pathname.endsWith("/data/pvp.json")) {
+    e.respondWith(
+      fetch(req)
+        .then(res => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(url.pathname, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(url.pathname))
     );
     return;
   }

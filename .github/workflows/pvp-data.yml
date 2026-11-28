@@ -1,0 +1,103 @@
+# Keeps the "Battle League: what's on now" data fresh and publishes the site.
+#
+# Runs every 6 hours, whenever main changes, and on demand (Actions tab > this workflow > Run workflow).
+# Each run:
+#   1. updates data/pvp.json from LeekDuck's calendar (via ScrapedDuck) and PvPoke's rankings
+#   2. saves the file to the repo if the leagues or rankings changed
+#   3. publishes the site to GitHub Pages
+# If a data source had a problem, the last good data is kept, the site is still published,
+# and the run is then marked as failed so GitHub emails you.
+#
+# One-off setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+
+name: Battle League data and site
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# One run at a time, and never cancel a run part-way through publishing
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Get the site
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Update Battle League data
+        id: update
+        continue-on-error: true
+        run: node scripts/update-pvp-data.mjs
+
+      - name: Save data changes to the repo
+        id: save
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp data/pvp.json "$RUNNER_TEMP/pvp.json"
+          saved=no
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$RUNNER_TEMP/pvp.json" data/pvp.json
+            git add data/pvp.json
+            if git diff --cached --quiet; then echo "Nothing new to save."; saved=yes; break; fi
+            git commit -m "Update Battle League data"
+            if git push origin HEAD:main; then saved=yes; break; fi
+            echo "Push failed (main moved on?), trying again."
+            git reset --hard origin/main
+            sleep 10
+          done
+          # Publish what we have either way; the last step reports a failed save
+          cp "$RUNNER_TEMP/pvp.json" data/pvp.json
+          if [ "$saved" != yes ]; then echo "failed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Gather the site files
+        run: |
+          mkdir -p _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'scripts' --exclude '_site' ./ _site/
+
+      - name: Set up Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Publish
+        id: deploy
+        uses: actions/deploy-pages@v5
+
+      - name: Report data problems
+        if: steps.update.outcome == 'failure' || steps.update.outputs.errors != '0' || steps.save.outputs.failed == 'true'
+        env:
+          SUMMARY: ${{ steps.update.outputs.summary }}
+          SAVE_FAILED: ${{ steps.save.outputs.failed }}
+        run: |
+          if [ "$SAVE_FAILED" = "true" ]; then echo "::error::Couldn't save the updated data/pvp.json to the repo (is main protected?). The site was still published with it."; fi
+          if [ -n "$SUMMARY" ] || [ "$SAVE_FAILED" != "true" ]; then echo "::error::The Battle League data update had a problem (the site was still published with the last good data): ${SUMMARY:-see the 'Update Battle League data' step}"; fi
+          exit 1

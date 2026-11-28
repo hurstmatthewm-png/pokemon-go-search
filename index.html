@@ -78,6 +78,22 @@
   .tl-warn{font-size:13px;color:var(--ex);margin:0 2px 8px}
   .tl-warn:empty{display:none}
   .tl-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:8px;min-height:1.2em}
+  .pvp-depth{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .pvp-depth span{font-weight:600;font-size:14px;margin-right:4px}
+  .pvp-status{font-size:13px;color:var(--muted);margin:0 2px 8px;line-height:1.4}
+  .pvp-status:empty{display:none}
+  .pvp-status.warn{color:var(--ex)}
+  .pvp-status button{padding:4px 10px;margin-left:4px;font-size:13px}
+  .pvp-status a{color:var(--any)}
+  .pvp-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+  .pvp-list:empty{display:none}
+  .pvp-card{padding:10px;border:1px solid var(--line);border-radius:10px}
+  .pvp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-bottom:4px}
+  .pvp-head b{font-size:15px}
+  .pvp-head small{color:var(--muted);font-size:12px}
+  .pvp-rules{font-size:13px;margin-bottom:4px}
+  .pvp-meta{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+  .pvp-out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--any);word-break:break-all;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:6px;line-height:1.45;max-height:calc(5.8em + 18px);overflow:auto}
   main{padding:12px 14px 60px;max-width:900px;margin:0 auto}
   #filter{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:10px}
   section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
@@ -217,6 +233,23 @@
     <div class="hint">Tip: you can paste a whole list like “hisuian voltorb, alolan vulpix, flamigo”. Pokémon names are used so the game's “show evolutions” option still works; a few (like Mew, which would also find Mewtwo, or names with spaces such as Mr. Mime) use Pokédex numbers instead. Use “Open in builder” to add extras like <code>!traded</code>.</div>
   </details>
 
+  <details class="sec" id="pvp-sec">
+    <summary>Battle League: what's on now</summary>
+    <p class="hint" style="margin-top:0">A search for each GO Battle League league and cup that's on right now, built from PvPoke's rankings. Choose how many of the top-ranked Pokémon to include, then copy.</p>
+    <div class="pvp-depth" id="pvp-depth" role="group" aria-label="How many top-ranked Pokémon to include">
+      <span>Top</span>
+      <button type="button" class="fchip" data-n="15">15</button>
+      <button type="button" class="fchip" data-n="50">50</button>
+      <button type="button" class="fchip" data-n="100">100</button>
+      <button type="button" class="fchip" data-n="250">250</button>
+      <button type="button" class="fchip" data-n="0">All</button>
+    </div>
+    <div class="pvp-status" id="pvp-status" aria-live="polite"></div>
+    <div class="pvp-list" id="pvp-list"></div>
+    <div class="hint" id="pvp-next"></div>
+    <div class="hint">Rankings are PvPoke's simulations, not what's winning in the game right now. To include Pokémon that evolve into these, turn on the game's “Show evolutionary line” option after pasting. Times are in your time zone.</div>
+  </details>
+
   <details class="sec" id="paste-sec">
     <summary>Paste a search string to edit it</summary>
     <div class="brow"><input id="paste-in" class="wide" placeholder="e.g. 4*&amp;shiny,lucky&amp;!traded" autocapitalize="off" autocorrect="off" spellcheck="false"><button id="paste-btn">Load</button></div>
@@ -231,6 +264,7 @@
     <a class="coffee" href="https://buymeacoffee.com/muttchew" target="_blank" rel="noopener">☕ Found this useful? Buy me a coffee</a>
     <p><b>How the string is put together:</b> in Pokémon GO, <code>&amp;</code> means AND, <code>,</code> means OR, and <code>!</code> means NOT. Commas are grouped before ampersands, so <code>a&amp;b,c&amp;!d</code> reads as “a AND (b OR c) AND NOT d”.</p>
     <p>Terms come from Niantic’s help page plus well-known community terms (e.g. raid, gbl, rocket, gender, specialbackground). The game adds and renames terms now and then, so if one returns nothing it may have changed. Search terms are in English; other game languages use translated words.</p>
+    <p>Battle League schedule from <a href="https://leekduck.com/events/" target="_blank" rel="noopener">LeekDuck</a> (via <a href="https://github.com/bigfoott/ScrapedDuck" target="_blank" rel="noopener">ScrapedDuck</a>). Rankings from <a href="https://pvpoke.com/" target="_blank" rel="noopener">PvPoke</a> (MIT licence).</p>
     <p class="hint">Fan-made tool. Not affiliated with or endorsed by Niantic, Nintendo or The Pokémon Company. Pokémon and Pokémon GO are trademarks of their respective owners.</p>
   </footer>
 </main>
@@ -517,7 +551,7 @@ function recall(k,def){try{var v=localStorage.getItem(k);return v===null?def:JSO
 // Only one "any of" group fits the builder, so any further comma groups
 // (or negated comma groups) are kept as-is as custom terms, which keeps the meaning.
 function loadString(str){
-  str=String(str||"").slice(0,1000).toLowerCase().replace(/\s*([&,!])\s*/g,"$1").trim();
+  str=String(str||"").slice(0,10000).toLowerCase().replace(/\s*([&,!])\s*/g,"$1").trim();
   state.clear();order.length=0;
   var anyUsed=false;
   str.split("&").forEach(function(part){
@@ -865,6 +899,169 @@ document.getElementById("share").addEventListener("click",function(){
   window.addEventListener("hashchange",readHash);
   draw();
   readHash();
+})();
+
+// ---------- Battle League: what's on now ----------
+// Reads data/pvp.json, which .github/workflows/pvp-data.yml refreshes every few hours from
+// LeekDuck's league calendar (via ScrapedDuck) and PvPoke's rankings.
+(function(){
+  var sec=document.getElementById("pvp-sec");if(!sec)return;
+  var KEY="pgs-pvp-top",DEPTHS=[15,50,100,250,0],STALE_MS=2*864e5,RELOAD_MS=10*6e4;
+  var statusEl=document.getElementById("pvp-status"),listEl=document.getElementById("pvp-list"),nextEl=document.getElementById("pvp-next");
+  var depthEl=document.getElementById("pvp-depth");
+  var depth=recall(KEY,100);if(DEPTHS.indexOf(depth)<0)depth=100;
+  var data=null,loadedAt=0,loading=false,shown=[],sent={};
+  var LEAGUE={500:"Little Cup",1500:"Great League",2500:"Ultra League",10000:"Master League"};
+
+  // What to search for each Pokédex number: the name, unless it would also find a Pokémon from another
+  // evolution family (the game matches the start of a name, e.g. "mew" finds Mewtwo) or has spaces or
+  // punctuation; then the number. Names keep the game's "Show evolutionary line" option working.
+  var DEXL=(Array.isArray(window.PGS_DEX)?window.PGS_DEX:[]).map(function(d){return {key:String(d[0]).toLowerCase().replace(/\s+/g," ").trim(),chain:d[2]};});
+  var TERM={};
+  function term(n){
+    if(TERM[n])return TERM[n];
+    var e=DEXL[n-1],t=String(n);
+    if(e&&/^[a-z0-9-]+$/.test(e.key)&&!DEXL.some(function(o){return o!==e&&o.chain!==e.chain&&o.key.indexOf(e.key)===0;}))t=e.key;
+    return TERM[n]=t;
+  }
+
+  function once(path,title){if(sent[path])return;sent[path]=1;track(path,title);}
+  function slug(s){return String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60);}
+  function when(ms){
+    try{return new Date(ms).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});}
+    catch(e){return new Date(ms).toString();}
+  }
+  function day(ms){
+    try{return new Date(ms).toLocaleDateString(undefined,{day:"numeric",month:"short"});}catch(e){return new Date(ms).toDateString();}
+  }
+  function ago(ms){
+    var h=Math.floor((Date.now()-ms)/36e5);
+    if(h<1)return "less than an hour ago";
+    if(h<48)return h+(h===1?" hour ago":" hours ago");
+    return Math.floor(h/24)+" days ago";
+  }
+  function setStatus(html,warn){statusEl.innerHTML=html||"";statusEl.classList.toggle("warn",!!warn);}
+
+  // Catch cups count Pokémon caught since the season started: "age0-81" means caught in the last 81 days.
+  function catchStart(lg){var t=lg.catchFrom?new Date(lg.catchFrom).getTime():NaN;return isFinite(t)?t:null;}
+  function catchDays(lg){var t=catchStart(lg);if(t===null)return null;var d=Math.floor((Date.now()-t)/864e5);return d<0?null:d;}
+
+  function ranking(lg){var r=lg.rank&&data.rankings&&data.rankings[lg.rank];return r&&Array.isArray(r.dex)&&r.dex.length?r:null;}
+  function build(lg){
+    var r=ranking(lg),parts=[];
+    if(r)parts.push((depth?r.dex.slice(0,depth):r.dex).map(term).join(","));
+    if(lg.cp&&lg.cp<10000)parts.push("cp-"+lg.cp);
+    if(lg.kind==="catch"){var a=catchDays(lg);if(a!==null)parts.push("age0-"+a);parts.push("!mythical");}
+    return parts.join("&");
+  }
+  function rules(lg){
+    var bits=[lg.cp>=10000?"No CP limit":"Up to "+Number(lg.cp).toLocaleString("en")+" CP"+(lg.cpGuess?" (usual limit, check in game)":"")];
+    if(lg.megas)bits.push("Megas allowed");
+    if(lg.kind==="catch"){var t=catchStart(lg);bits.push(t!==null?"Caught since "+day(t):"Caught this season");bits.push("No Mythical Pokémon");}
+    return bits.join(" · ");
+  }
+  function meta(lg){
+    var r=ranking(lg),out=[];
+    if(!r)return "PvPoke hasn't ranked this one yet, so this search only checks the CP limit. Check the other rules in the game.";
+    var n=r.dex.length,k=depth&&depth<n?depth:n;
+    out.push((k<n?"Top "+k+" of "+n:"All "+n)+" ranked Pokémon"+(r.top&&r.top.length?". PvPoke's top picks: "+r.top.join(", "):"")+".");
+    if(lg.kind==="catch"){var t=catchStart(lg);out.push("Ranked with PvPoke's "+(LEAGUE[lg.cp]||"league")+" list"+(lg.megas?" (Megas allowed)":"")+", then limited to Pokémon caught "+(t!==null?"since "+day(t):"this season")+".");}
+    return out.join(" ");
+  }
+
+  function liveLeagues(now){
+    var seen={},out=[];
+    (data.weeks||[]).forEach(function(w){
+      var s=Date.parse(w.start),e=Date.parse(w.end);
+      if(!(s<=now&&now<e))return;
+      (w.leagues||[]).forEach(function(lg){if(seen[lg.name])return;seen[lg.name]=1;out.push({lg:lg,end:e});});
+    });
+    return out;
+  }
+  function nextWeek(now){
+    var n=null;
+    (data.weeks||[]).forEach(function(w){var s=Date.parse(w.start);if(s>now&&(!n||s<Date.parse(n.start)))n=w;});
+    return n;
+  }
+
+  function drawDepth(){
+    depthEl.querySelectorAll("button").forEach(function(b){
+      var on=Number(b.getAttribute("data-n"))===depth;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false");
+    });
+  }
+  function render(){
+    if(!data)return;
+    var now=Date.now(),live=liveLeagues(now);
+    shown=live;
+    // How fresh the information is
+    var c=data.checked||{},times=[Date.parse(c.leagues),Date.parse(c.rankings)].filter(function(x){return isFinite(x);});
+    var oldest=times.length===2?Math.min(times[0],times[1]):0;
+    if(!oldest||now-oldest>STALE_MS){
+      setStatus("Heads up: this was last refreshed "+(oldest?ago(oldest):"a while ago")+", so it may be out of date. Check the leagues in the game.",true);
+      once("pvp-stale","Saw out-of-date Battle League data");
+    }else if(!live.length){
+      setStatus('This week’s leagues aren’t confirmed yet. Check the game, or <a href="https://leekduck.com/events/" target="_blank" rel="noopener">LeekDuck’s event list</a>.',true);
+      once("pvp-none-live","No live Battle League found");
+    }else setStatus("Checked "+ago(oldest)+".");
+    // One card per league that's on now
+    listEl.innerHTML=live.map(function(x,i){
+      var lg=x.lg,str=build(lg);
+      return '<div class="pvp-card" data-i="'+i+'">'+
+        '<div class="pvp-head"><b>'+esc(lg.name)+'</b><small>Until '+esc(when(x.end))+'</small></div>'+
+        '<div class="pvp-rules">'+esc(rules(lg))+'</div>'+
+        '<div class="pvp-meta">'+esc(meta(lg))+'</div>'+
+        '<div class="pvp-out">'+(str?esc(str):"(nothing to filter: every Pokémon can enter)")+'</div>'+
+        (str?'<div class="brow"><button type="button" data-act="copy">Copy</button><button type="button" data-act="open">Open in builder</button></div>':'')+
+        '</div>';
+    }).join("");
+    // What's next
+    var nw=nextWeek(now);
+    nextEl.textContent=nw?"Next, from "+when(Date.parse(nw.start))+": "+(nw.leagues||[]).map(function(l){return l.name;}).join(", ")+".":"";
+  }
+
+  function load(){
+    if(loading)return;loading=true;
+    if(!data)setStatus("Loading this week’s leagues…");
+    fetch("data/pvp.json",{cache:"no-cache"})
+      .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+      .then(function(d){
+        if(!d||!Array.isArray(d.weeks))throw new Error("bad data");
+        data=d;loadedAt=Date.now();loading=false;render();
+      })
+      .catch(function(){
+        loading=false;
+        if(data){render();return;} // keep showing what we had
+        setStatus('Couldn’t load the Battle League leagues. Check your connection, then <button type="button" data-act="retry">Try again</button>',true);
+        once("pvp-load-failed","Couldn't load Battle League data");
+      });
+  }
+
+  depthEl.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-n]");if(!b)return;
+    depth=Number(b.getAttribute("data-n"));store(KEY,depth);drawDepth();render();
+  });
+  statusEl.addEventListener("click",function(e){if(e.target.closest('[data-act="retry"]'))load();});
+  listEl.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-act]"),card=b&&b.closest(".pvp-card");if(!card)return;
+    var x=shown[Number(card.getAttribute("data-i"))];if(!x)return;
+    var lg=x.lg,str=build(lg);if(!str)return;
+    if(b.getAttribute("data-act")==="copy"){
+      track("pvp-copy-"+slug(lg.name),"Copied Battle League search: "+lg.name);
+      if(ranking(lg))track("pvp-top-"+(depth||"all"),"Battle League search size: "+(depth?"top "+depth:"all ranked"));
+      if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(str).then(function(){flash(b,"Copied!");},function(){prompt("Copy this:",str);});
+      else prompt("Copy this:",str);
+    }else{
+      loadString(str);track("pvp-open-builder","Opened a Battle League search in the builder");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  });
+  // Load when the section is first opened; on later opens, refresh the times (and the data if it's been a while)
+  sec.addEventListener("toggle",function(){
+    if(!sec.open)return;
+    if(!data||Date.now()-loadedAt>RELOAD_MS)load();else render();
+  });
+  drawDepth();
+  if(sec.open)load();
 })();
 
 // ---------- 6. paste to edit ----------

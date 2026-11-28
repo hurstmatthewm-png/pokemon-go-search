@@ -1,0 +1,544 @@
+{
+ "version": 1,
+ "about": "Made by scripts/update-pvp-data.mjs. League calendar: LeekDuck via ScrapedDuck. Rankings: PvPoke (MIT licence).",
+ "checked": {
+  "leagues": "2026-11-28T02:07:35.214Z",
+  "rankings": "2026-11-28T02:07:35.214Z"
+ },
+ "errors": [],
+ "seasons": [
+  {
+   "name": "Twilight Trails",
+   "start": "2026-09-08T10:00:00.000",
+   "end": "2026-12-01T10:00:00.000"
+  },
+  {
+   "name": "Daydream Destinations",
+   "start": "2026-12-01T10:00:00.000",
+   "end": "2027-03-01T10:00:00.000"
+  }
+ ],
+ "cups": [
+  {
+   "name": "all",
+   "title": "All Pokemon"
+  },
+  {
+   "name": "battlefrontiermaster",
+   "title": "Battle Frontier (Master League)"
+  },
+  {
+   "name": "catch",
+   "title": "Catch Cup"
+  },
+  {
+   "name": "cauldron",
+   "title": "Cauldron Cup"
+  },
+  {
+   "name": "championshipseries",
+   "title": "P!P Championship Series"
+  },
+  {
+   "name": "chrysalis",
+   "title": "Chrysalis Cup - Devon World Championship 2026"
+  },
+  {
+   "name": "classic",
+   "title": "Classic"
+  },
+  {
+   "name": "colormega",
+   "title": "Mega Color Cup"
+  },
+  {
+   "name": "copadiluvio",
+   "title": "Battle Frontier (Copa Dilúvio)"
+  },
+  {
+   "name": "coupedusillage",
+   "title": "Battle Frontier (Coupe du Sillage)"
+  },
+  {
+   "name": "custom",
+   "title": "Custom"
+  },
+  {
+   "name": "fable",
+   "title": "Fable Cup"
+  },
+  {
+   "name": "fantasy",
+   "title": "Fantasy Cup"
+  },
+  {
+   "name": "gobattleleague",
+   "title": "GO Battle League"
+  },
+  {
+   "name": "gymbreakers",
+   "title": "Gymbreakers Invitational Season 7"
+  },
+  {
+   "name": "halloweenmega",
+   "title": "Mega Halloween Cup"
+  },
+  {
+   "name": "laic2027",
+   "title": "LAIC 2027 Championship Series Cup"
+  },
+  {
+   "name": "laic2027gbl",
+   "title": "LAIC 2027 Championship Series Cup (GBL)"
+  },
+  {
+   "name": "ligaultra",
+   "title": "Battle Frontier (Liga Ultra)"
+  },
+  {
+   "name": "little",
+   "title": "Little Cup"
+  },
+  {
+   "name": "mega",
+   "title": "All Pokemon"
+  },
+  {
+   "name": "premier",
+   "title": "Premier Cup"
+  },
+  {
+   "name": "retro",
+   "title": "Retro Cup"
+  },
+  {
+   "name": "spectral",
+   "title": "Spectral Cup"
+  },
+  {
+   "name": "trail",
+   "title": "Trail Cup"
+  },
+  {
+   "name": "tsuki",
+   "title": "Battle Frontier (Tsuki Cup)"
+  },
+  {
+   "name": "willpower",
+   "title": "Willpower Cup"
+  }
+ ],
+ "weeks": [
+  {
+   "key": "2026-11-24T21:00:00.000Z|2026-12-01T21:00:00.000Z",
+   "title": "Master League and Mega Catch Cup: Great League Edition | Twilight Trails",
+   "start": "2026-11-24T21:00:00.000Z",
+   "end": "2026-12-01T21:00:00.000Z",
+   "link": "",
+   "manual": true,
+   "leagues": [
+    {
+     "name": "Master League",
+     "cp": 10000,
+     "megas": false,
+     "kind": "league",
+     "rank": "all-10000"
+    },
+    {
+     "name": "Mega Catch Cup: Great League Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "catch",
+     "catchFrom": "2026-09-08T10:00:00.000",
+     "rank": "mega-1500"
+    }
+   ]
+  },
+  {
+   "key": "2026-12-01T21:00:00.000Z|2026-12-08T21:00:00.000Z",
+   "title": "Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Daydream Destinations",
+   "start": "2026-12-01T21:00:00.000Z",
+   "end": "2026-12-08T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_ultra-league-mega-edition_master-league-mega-edition-split-1/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    }
+   ]
+  },
+  {
+   "key": "2026-12-08T21:00:00.000Z|2026-12-15T21:00:00.000Z",
+   "title": "Great League: Mega Edition and Mountain Cup: Great League Edition | Daydream Destinations",
+   "start": "2026-12-08T21:00:00.000Z",
+   "end": "2026-12-15T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_mountain-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Mountain Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2026-12-15T21:00:00.000Z|2026-12-22T21:00:00.000Z",
+   "title": "Ultra League: Mega Edition and Holiday Cup: Great League Edition | Daydream Destinations",
+   "start": "2026-12-15T21:00:00.000Z",
+   "end": "2026-12-22T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_ultra-league-mega-edition_holiday-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Holiday Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2026-12-22T21:00:00.000Z|2026-12-29T21:00:00.000Z",
+   "title": "Master League: Mega Edition and Holiday Cup: Great League Edition | Daydream Destinations",
+   "start": "2026-12-22T21:00:00.000Z",
+   "end": "2026-12-29T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_master-league-mega-edition_holiday-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    },
+    {
+     "name": "Holiday Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2026-12-29T21:00:00.000Z|2027-01-05T21:00:00.000Z",
+   "title": "Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Daydream Destinations",
+   "start": "2026-12-29T21:00:00.000Z",
+   "end": "2027-01-05T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_ultra-league-mega-edition_master-league-mega-edition-split-2/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    }
+   ]
+  },
+  {
+   "key": "2027-01-05T21:00:00.000Z|2027-01-12T21:00:00.000Z",
+   "title": "Great League: Mega Edition and Fighting Cup: Great League Edition | Daydream Destinations",
+   "start": "2027-01-05T21:00:00.000Z",
+   "end": "2027-01-12T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_fighting-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Fighting Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2027-01-12T21:00:00.000Z|2027-01-19T21:00:00.000Z",
+   "title": "Ultra League: Mega Edition and Jungle Cup: Great League Edition | Daydream Destinations",
+   "start": "2027-01-12T21:00:00.000Z",
+   "end": "2027-01-19T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_ultra-league-mega-edition_jungle-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Jungle Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2027-01-19T21:00:00.000Z|2027-01-26T21:00:00.000Z",
+   "title": "Master League: Mega Edition and Master League | Daydream Destinations",
+   "start": "2027-01-19T21:00:00.000Z",
+   "end": "2027-01-26T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_master-league-mega-edition_master-league/",
+   "leagues": [
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    },
+    {
+     "name": "Master League",
+     "cp": 10000,
+     "megas": false,
+     "kind": "league",
+     "rank": "all-10000"
+    }
+   ]
+  },
+  {
+   "key": "2027-01-26T21:00:00.000Z|2027-02-02T21:00:00.000Z",
+   "title": "Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Daydream Destinations",
+   "start": "2027-01-26T21:00:00.000Z",
+   "end": "2027-02-02T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_ultra-league-mega-edition_master-league-mega-edition-split-3/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    }
+   ]
+  },
+  {
+   "key": "2027-02-02T21:00:00.000Z|2027-02-09T21:00:00.000Z",
+   "title": "Great League: Mega Edition and Master League | Daydream Destinations",
+   "start": "2027-02-02T21:00:00.000Z",
+   "end": "2027-02-09T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_master-league/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Master League",
+     "cp": 10000,
+     "megas": false,
+     "kind": "league",
+     "rank": "all-10000"
+    }
+   ]
+  },
+  {
+   "key": "2027-02-09T21:00:00.000Z|2027-02-16T21:00:00.000Z",
+   "title": "Ultra League: Mega Edition, Love Cup: Great League Edition, and 2027 GO EUIC Cup | Daydream Destinations",
+   "start": "2027-02-09T21:00:00.000Z",
+   "end": "2027-02-16T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_ultra-league-mega-edition_love-cup-great-league-edition_2027-go-euic-cup/",
+   "leagues": [
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Love Cup: Great League Edition",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "rank": null
+    },
+    {
+     "name": "2027 GO EUIC Cup",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "cpGuess": true,
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2027-02-16T21:00:00.000Z|2027-02-23T21:00:00.000Z",
+   "title": "Master League: Mega Edition, Mega Catch Cup: Great League Edition, and 2027 GO EUIC Cup | Daydream Destinations",
+   "start": "2027-02-16T21:00:00.000Z",
+   "end": "2027-02-23T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_master-league-mega-edition_mega-catch-cup-great-league-edition_2027-go-euic-cup/",
+   "leagues": [
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    },
+    {
+     "name": "Mega Catch Cup: Great League Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "catch",
+     "catchFrom": "2026-12-01T10:00:00.000",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "2027 GO EUIC Cup",
+     "cp": 1500,
+     "megas": false,
+     "kind": "cup",
+     "cpGuess": true,
+     "rank": null
+    }
+   ]
+  },
+  {
+   "key": "2027-02-23T21:00:00.000Z|2027-03-02T21:00:00.000Z",
+   "title": "Great League: Mega Edition, Ultra League: Mega Edition, Master League: Mega Edition, and Mega Catch Cup: Great League Edition | Daydream Destinations",
+   "start": "2027-02-23T21:00:00.000Z",
+   "end": "2027-03-02T21:00:00.000Z",
+   "link": "https://leekduck.com/events/gbl-daydream-destinations_great-league-mega-edition_ultra-league-mega-edition_master-league-mega-edition_mega-catch-cup-great-league-edition/",
+   "leagues": [
+    {
+     "name": "Great League: Mega Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-1500"
+    },
+    {
+     "name": "Ultra League: Mega Edition",
+     "cp": 2500,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-2500"
+    },
+    {
+     "name": "Master League: Mega Edition",
+     "cp": 10000,
+     "megas": true,
+     "kind": "league",
+     "rank": "mega-10000"
+    },
+    {
+     "name": "Mega Catch Cup: Great League Edition",
+     "cp": 1500,
+     "megas": true,
+     "kind": "catch",
+     "catchFrom": "2026-12-01T10:00:00.000",
+     "rank": "mega-1500"
+    }
+   ]
+  }
+ ],
+ "rankings": {
+  "all-10000": {
+   "dex": [484,888,646,376,382,483,718,643,249,792,901,800,716,890,889,250,802,647,644,383,445,809,130,381,791,645,730,717,812,487,671,1000,648,150,983,149,905,635,464,786,380,248,534,468,706,385,649,485,491,243,700,721,892,998,768,373,450,145,143,260,979,473,494,798,977,807,788,893,652,784,640,384,787,713,146,638,903,806,911,642,462,144,851,488,655,526,936,151,350,914,796,975,530,68,639,475,861,794,306,609,623,895,389,251,244,937,785,675,160,365,612,699,6,781,472,214,760,157,673,245,553,377,466,724,395,212,500,865,750,738,793,766,131,297,727,467,797,378,134,555,127,538,1013,844,217,407,637,720,230,799,589,503,142,815,904,282,89,1019,3,232,887,486,939,641,537,181,128,465,614,864,949,461,855,379,823,711,65,76,492,115,136,780,567,805,208,59,934,73,196,668,80,615,625,689,103,62,763,697,470,405,9,719,862,930,943,508,884,471,481,169,900,966,199,463,112,135,474,916,765,348,874,839,866,139,715,628,584,621,970,482,982,369,740,197,480,899,579,626,241,386,409,233,804,469,518,565,601,242,289],
+   "top": [
+    "Palkia (Origin)",
+    "Zacian (Crowned Sword)",
+    "Kyurem (White)"
+   ]
+  },
+  "mega-10000": {
+   "dex": [382,130,150,445,384,149,383,248,376,380,381,214,260,373,652,306,483,655,484,212,6,901,475,718,716,94,647,809,983,646,249,643,644,888,800,889,802,671,717,142,635,181,9,792,890,658,892,448,812,229,282,398,700,893,115,798,487,468,645,127,730,121,26,257,706,254,786,491,609,1000,80,649,768,791,905,243,534,788,460,979,145,998,462,208,464,870,250,784,787,3,648,428,334,640,721,687,807,15,642,143,385,473,485,914,450,350,65,713,68,796,227,638,144,977,699,861,526,18,146,675,639,160,903,151,785,975,488,395,71,794,377,365,865,466,895,612,494,530,719,389,724,251,673,134,851,781,760,623,503,354,793,297,553,319,538,766,362,323,911,799,806,378,244,230,936,738,245,131,472,797,904,128,217,750,589,805,727,465,157,937,89,310,492,1019,614,407,720,844,500,232,697,461,780,531,689,359,1013,855,486,763,939,823,934,62,379,641,555,864,887,567,537,76,862,930,470,103,467,508,615,303,815,711,949,625,59,884,943,308,196,405,668,916,740,874,348,73,637,169,136,135,474,900,139,369,471,765,112,982,463,584,966,197,839,970,199,628,621,481,715,409,482,565,626,866,302,899,480,233,579,241,469,386,601,518,804,242,289],
+   "top": [
+    "Kyogre (Primal)",
+    "Gyarados (Mega)",
+    "Mewtwo (Mega X)"
+   ]
+  },
+  "mega-1500": {
+   "dex": [302,809,334,38,778,959,671,845,823,222,195,635,752,980,828,184,197,206,22,105,703,812,618,288,593,687,226,395,979,101,737,160,799,131,386,189,630,977,162,450,205,230,308,877,9,148,776,346,417,87,660,143,356,260,680,681,683,537,663,901,918,36,372,89,452,326,379,208,40,711,765,477,895,503,119,351,706,860,365,733,198,364,8,939,324,207,110,279,442,916,211,774,53,317,973,768,241,221,176,748,658,784,634,699,375,705,229,707,146,488,350,186,700,558,411,463,303,468,691,26,904,28,6,587,487,685,460,832,78,531,243,968,413,723,502,166,144,820,18,975,272,149,428,68,925,227,867,538,563,380,457,71,783,62,462,31,181,839,85,264,732,164,702,945,754,219,730,423,108,67,547,257,212,352,338,958,313,159,675,627,73,591,983,849,701,202,807,437,337,472,962,861,145,182,662,262,476,344,130,473,377,157,533,923,416,673,57,24,997,168,851,475,373,121,698,914,581,217,644,466,30,709,190,216,974,652,756,649,484,758,171,435,738,534,34,949,780,385,920,81,927,97,446,20,931,42,449,532,936,327,169,320,982,381,345,496,478,600,933,340,306,426,115,82,3,323,529,892,83,398,624,497,727,788,642,330,259,154,151,480,494,106,655,596,27,777,806,297,798,826,142,214,80,321,689,934,911,676,94,254,357,623,199,629,908,407,781,362,713,571,609,445,454,203,314,88,66,448,710,724,530,592,141,608,560,718,369,643,245,430,667,500,429,539,178,847,654,342,764,621,865,444,384,636,542,910,913,523,76,75,15,389,598,93,770,134,863,651,998,766,248,1011,611,612,249,841,941,674,123,127,348,779,305,126,589,467,464,545,760,275,335,5,822,125,228,499,332,140,682,237,594,603,922,610,815,256,900,620,397,622,391,378,528,49,526,441,797,870,485,1019,310,77,894,113,536,400,619,128,79,329,996,645,862,47,541,359,200,483,402,358,899,153,903,838,425,251,419,58,972,240,1000,588,238,858,432,668,304,367,632,376,937,750,586,70,347,615,626,136,388,405,336,239,670,55,844,277,59,614,554,631,696,74,857,564,383,17,759,284,697,43,721,465,215,853,253,434,811,301,555,250,319,427,470,929,458,726,677,907,56,122,156,842,505,424,107,294,830,956,109,794,942,421,873,44,150,2,135,569,749,803,137,719,295,715,625,232,855,735,209,712,103,550,947,138,61,394,91,576,678,479,583,65,267,743,51,818,210,33,291,690,559,891,507,950,508,422,269,943,886,196,553,244,481,312,95,814,111,158,185,459,769,575,729,695,404,438,180,617,139,679,72,286,461,601,451,45,884,354,455,552,274,966,843,930,242,104,864,193,745,518,118,233,566,86,382,392,512,567,282,204,948,328,604,970,549,909,510,492,516,874,969,741,114,514,520,96,124,763,247,573,565,102,544,525,628,231,684,887,99,469,557,585,409,740,866,666,579,341,170,482,133,271,414,584,366,98,836,722,192,311,605,728,876,692,606,1,299,775,817,112,978,650,224,117,556,315,234,393,471,524,521,64,561,739,804,368,965,657,805,693,408,961,669,641,720,597,825,474,387,517,12,578,808,577,672,486,852,325,35,201,289],
+   "top": [
+    "Sableye (Mega)",
+    "Melmetal",
+    "Altaria"
+   ]
+  },
+  "mega-2500": {
+   "dex": [959,823,718,671,778,143,640,146,395,160,809,487,799,593,845,38,89,911,812,477,131,36,895,977,379,488,205,687,663,867,365,683,386,208,9,733,181,730,346,468,939,230,119,768,144,537,962,916,979,350,503,260,776,700,558,130,241,765,646,531,334,680,110,563,452,649,221,685,6,450,197,968,145,380,326,26,635,630,638,463,784,73,460,149,186,243,691,85,861,699,303,706,226,31,618,272,973,423,658,983,78,709,851,426,150,442,717,249,28,279,212,644,71,182,839,462,904,701,901,437,596,820,34,68,472,788,828,257,975,754,770,538,982,101,330,151,675,949,466,435,229,643,591,713,673,807,724,711,945,378,849,781,377,121,716,157,936,323,385,302,727,473,227,3,214,484,534,169,18,154,80,652,623,337,863,494,920,480,321,57,806,483,430,381,934,338,655,914,905,923,454,94,373,389,407,545,445,647,82,802,324,106,1000,542,738,22,308,211,533,372,217,642,780,475,877,560,497,998,598,250,376,398,448,62,689,707,980,178,892,997,941,306,758,786,927,362,297,245,59,15,826,1013,508,67,384,609,87,621,705,791,571,937,254,581,164,798,844,526,547,779,530,429,1011,589,815,123,416,142,632,774,478,648,317,369,832,126,358,721,899,523,491,125,97,340,750,894,500,645,171,134,199,485,141,764,841,858,1019,195,344,115,586,785,539,903,248,127,787,128,332,890,594,842,908,615,76,972,465,284,889,612,715,847,797,237,467,626,232,743,342,382,428,620,865,464,251,870,55,135,800,777,760,792,611,49,668,576,383,900,479,203,641,555,352,766,752,122,244,359,947,862,275,794,956,697,614,288,335,45,91,419,295,631,40,42,553,756,676,625,367,348,476,931,405,888,719,950,103,210,893,702,262,681,634,855,884,569,105,925,639,136,763,24,107,481,224,853,470,604,319,354,282,65,233,196,357,424,518,336,305,313,943,215,99,461,242,695,392,741,617,735,139,864,514,930,628,176,310,375,584,678,887,189,796,966,124,446,421,457,286,207,516,866,910,723,579,745,455,47,601,600,793,512,114,444,185,978,818,499,873,550,200,549,876,805,469,720,775,567,413,874,748,740,162,75,693,368,364,565,606,314,830,573,432,482,836,219,471,206,388,492,521,259,561,804,811,637,703,749,970,112,192,400,184,525,556,20,729,474,117,234,409,411,486,113,289],
+   "top": [
+    "Tinkaton",
+    "Corviknight",
+    "Zygarde (Complete Forme)"
+   ]
+  }
+ }
+}
